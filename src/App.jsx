@@ -23,6 +23,18 @@ const injectStyles = () => {
     body { font-family: 'Sora', sans-serif; background: #080b14; color: #f4f1ea; -webkit-font-smoothing: antialiased; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 
+    /* Cards render in their "lit" state on every device; hover adds a small desktop-only lift. */
+    .card-lit {
+      transition: transform 0.35s cubic-bezier(.16,1,.3,1), border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .card-lit:hover {
+        transform: translateY(-2px) !important;
+        border-color: rgba(59,130,246,0.3) !important;
+        box-shadow: 0 10px 32px rgba(59,130,246,0.12);
+      }
+    }
+
     /* ── Hero Figure (voxel sphere + bust scene) ── */
     @keyframes hf-spin {
       from { transform: translate(-50%,-50%) rotateX(-14deg) rotateY(-24deg); }
@@ -129,36 +141,33 @@ const Reveal = ({ children, delay = 0, className = "", y = 30 }) => {
 
 /* ─── Feature Card ─── */
 const FeatureCard = ({ icon, title, description, delay = 0 }) => {
-  const [hovered, setHovered] = useState(false);
   const [ref, isInView] = useInView();
   const IconComp = icon;
   return (
     <div
       ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="card-lit"
       style={{
         borderRadius: 16,
         padding: 32,
-        background: hovered ? "rgba(59,130,246,0.04)" : "rgba(255,255,255,0.02)",
+        background: "rgba(59,130,246,0.04)",
         backdropFilter: "blur(20px)",
-        border: hovered ? "1px solid rgba(59,130,246,0.15)" : "1px solid rgba(255,255,255,0.05)",
-        transition: "all 0.35s ease",
+        border: "1px solid rgba(59,130,246,0.15)",
         opacity: isInView ? 1 : 0,
         transform: isInView ? "translateY(0)" : "translateY(24px)",
-        transitionDelay: `${delay}s`,
+        transition: `opacity 0.7s cubic-bezier(.16,1,.3,1) ${delay}s, transform 0.7s cubic-bezier(.16,1,.3,1) ${delay}s, border-color 0.35s ease, box-shadow 0.35s ease`,
         cursor: "default",
       }}
     >
       <div
         style={{
           width: 48, height: 48, borderRadius: 12,
-          background: hovered ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.04)",
+          background: "rgba(59,130,246,0.12)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          marginBottom: 20, transition: "background 0.35s ease",
+          marginBottom: 20,
         }}
       >
-        <IconComp size={22} style={{ color: hovered ? "#3b82f6" : "#64748b", transition: "color 0.35s ease" }} />
+        <IconComp size={22} style={{ color: "#3b82f6" }} />
       </div>
       <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 16, color: "#f4f1ea", marginBottom: 10 }}>
         {title}
@@ -915,10 +924,10 @@ export default function EtherLanding() {
               const IconComp = s.icon;
               return (
                 <Reveal key={i} delay={0.1 + i * 0.1}>
-                  <div style={{
+                  <div className="card-lit" style={{
                     borderRadius: 16, padding: 32,
-                    background: "rgba(255,255,255,0.02)", backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.05)",
+                    background: "rgba(59,130,246,0.04)", backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(59,130,246,0.14)",
                     borderTop: `3px solid ${s.color}`,
                   }}>
                     <IconComp size={22} style={{ color: s.color, marginBottom: 16 }} />
@@ -936,10 +945,10 @@ export default function EtherLanding() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, maxWidth: 960, margin: "0 auto" }}>
             {testimonials.map((t, i) => (
               <Reveal key={i} delay={0.1 + i * 0.1}>
-                <div style={{
+                <div className="card-lit" style={{
                   borderRadius: 16, padding: 32,
-                  background: "rgba(255,255,255,0.02)", backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.05)",
+                  background: "rgba(59,130,246,0.04)", backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(59,130,246,0.14)",
                 }}>
                   <MessageCircle size={20} style={{ color: "#3b82f6", marginBottom: 18 }} />
                   <p style={{
