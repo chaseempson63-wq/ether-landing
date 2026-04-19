@@ -20,10 +20,7 @@ const injectStyles = () => {
   style.textContent = `
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; scroll-padding-top: 80px; }
-    body { font-family: 'Sora', sans-serif; background: #080b14; color: #c8d0df; -webkit-font-smoothing: antialiased; }
-    @keyframes orbit1 { 0% { transform: translate(-50%,-50%) rotate(0deg) translateX(220px); } 100% { transform: translate(-50%,-50%) rotate(360deg) translateX(220px); } }
-    @keyframes orbit2 { 0% { transform: translate(-50%,-50%) rotate(120deg) translateX(180px); } 100% { transform: translate(-50%,-50%) rotate(480deg) translateX(180px); } }
-    @keyframes orbit3 { 0% { transform: translate(-50%,-50%) rotate(240deg) translateX(260px); } 100% { transform: translate(-50%,-50%) rotate(600deg) translateX(260px); } }
+    body { font-family: 'Sora', sans-serif; background: #080b14; color: #f4f1ea; -webkit-font-smoothing: antialiased; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
   `;
   document.head.appendChild(style);
@@ -77,7 +74,7 @@ const StatBlock = ({ number, label, delay = 0 }) => {
         transition: `all 0.6s cubic-bezier(.16,1,.3,1) ${delay}s`,
       }}
     >
-      <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 48, color: "#fff", lineHeight: 1 }}>
+      <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 48, color: "#f4f1ea", lineHeight: 1 }}>
         {number}
       </div>
       <div style={{ fontSize: 13, color: "#64748b", fontWeight: 300, marginTop: 8, letterSpacing: "0.04em" }}>
@@ -120,10 +117,10 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => {
       >
         <IconComp size={22} style={{ color: hovered ? "#3b82f6" : "#64748b", transition: "color 0.35s ease" }} />
       </div>
-      <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 16, color: "#fff", marginBottom: 10 }}>
+      <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 16, color: "#f4f1ea", marginBottom: 10 }}>
         {title}
       </h3>
-      <p style={{ fontSize: 14, color: "#64748b", fontWeight: 300, lineHeight: 1.7 }}>{description}</p>
+      <p style={{ fontSize: 14, color: "#94a3b8", fontWeight: 300, lineHeight: 1.7 }}>{description}</p>
     </div>
   );
 };
@@ -138,7 +135,7 @@ const FAQItem = ({ question, answer, isLast }) => {
         style={{
           width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "20px 0", background: "none", border: "none", cursor: "pointer",
-          fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 15, color: "#c8d0df", textAlign: "left",
+          fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 15, color: "#f4f1ea", textAlign: "left",
         }}
       >
         <span>{question}</span>
@@ -157,7 +154,7 @@ const FAQItem = ({ question, answer, isLast }) => {
           transition: "max-height 0.4s cubic-bezier(.16,1,.3,1)",
         }}
       >
-        <p style={{ fontSize: 14, color: "#64748b", fontWeight: 300, lineHeight: 1.8, paddingBottom: 20 }}>
+        <p style={{ fontSize: 14, color: "#94a3b8", fontWeight: 300, lineHeight: 1.8, paddingBottom: 20 }}>
           {answer}
         </p>
       </div>
@@ -223,7 +220,7 @@ export default function EtherLanding() {
     <h2
       style={{
         fontFamily: "'Sora', sans-serif", fontWeight: 700, textTransform: "uppercase",
-        fontSize: "clamp(24px, 4vw, 40px)", color: "#fff", lineHeight: 1.15,
+        fontSize: "clamp(24px, 4vw, 40px)", color: "#f4f1ea", lineHeight: 1.15,
         letterSpacing: "-0.01em", maxWidth: 780, ...extra,
       }}
       dangerouslySetInnerHTML={{ __html: text }}
@@ -272,13 +269,6 @@ export default function EtherLanding() {
       {/* ─── Background ─── */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.05), transparent 65%)", pointerEvents: "none" }} />
 
-      {/* Orbital dots */}
-      <div style={{ position: "fixed", top: "38%", left: "50%", zIndex: 1, pointerEvents: "none" }}>
-        <div style={{ position: "absolute", width: 6, height: 6, borderRadius: "50%", background: "#3b82f6", opacity: 0.5, animation: "orbit1 20s linear infinite" }} />
-        <div style={{ position: "absolute", width: 5, height: 5, borderRadius: "50%", background: "#8b5cf6", opacity: 0.4, animation: "orbit2 25s linear infinite" }} />
-        <div style={{ position: "absolute", width: 4, height: 4, borderRadius: "50%", background: "#06b6d4", opacity: 0.45, animation: "orbit3 30s linear infinite" }} />
-      </div>
-
       {/* ─── Content wrapper ─── */}
       <div style={{ position: "relative", zIndex: 10 }}>
         {/* ═══ NAVBAR ═══ */}
@@ -292,13 +282,13 @@ export default function EtherLanding() {
             transition: "all 0.4s ease",
           }}
         >
-          <a href="#top" onClick={scrollTo("top")} style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 20, color: "#fff", textDecoration: "none", letterSpacing: "-0.03em" }}>
+          <a href="#top" onClick={scrollTo("top")} style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 20, color: "#f4f1ea", textDecoration: "none", letterSpacing: "-0.03em" }}>
             Ether
           </a>
           <div style={{ display: "flex", gap: 32, alignItems: "center" }} className="nav-links">
             {["Features", "Stories", "FAQ"].map((l) => (
-              <a key={l} href={`#${l.toLowerCase()}`} onClick={scrollTo(l.toLowerCase())} style={{ fontSize: 13, color: "#64748b", textDecoration: "none", fontWeight: 400, transition: "color 0.2s", display: "var(--nav-link-display, none)", cursor: "pointer" }}
-                onMouseEnter={(e) => (e.target.style.color = "#c8d0df")} onMouseLeave={(e) => (e.target.style.color = "#64748b")}>
+              <a key={l} href={`#${l.toLowerCase()}`} onClick={scrollTo(l.toLowerCase())} style={{ fontSize: 13, color: "#94a3b8", textDecoration: "none", fontWeight: 400, transition: "color 0.2s", display: "var(--nav-link-display, none)", cursor: "pointer" }}
+                onMouseEnter={(e) => (e.target.style.color = "#f4f1ea")} onMouseLeave={(e) => (e.target.style.color = "#94a3b8")}>
                 {l}
               </a>
             ))}
@@ -306,7 +296,7 @@ export default function EtherLanding() {
               onMouseEnter={(e) => (e.target.style.background = "#2563eb")} onMouseLeave={(e) => (e.target.style.background = "#3b82f6")}>
               Get Early Access
             </a>
-            <button onClick={() => setMobileMenu(!mobileMenu)} style={{ display: "var(--menu-btn-display, block)", background: "none", border: "none", color: "#c8d0df", cursor: "pointer", padding: 4 }}>
+            <button onClick={() => setMobileMenu(!mobileMenu)} style={{ display: "var(--menu-btn-display, block)", background: "none", border: "none", color: "#f4f1ea", cursor: "pointer", padding: 4 }}>
               {mobileMenu ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
@@ -322,7 +312,7 @@ export default function EtherLanding() {
         {mobileMenu && (
           <div style={{ position: "fixed", top: 64, left: 0, right: 0, zIndex: 49, background: "rgba(8,11,20,0.95)", backdropFilter: "blur(20px)", padding: "24px 32px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", flexDirection: "column", gap: 20 }}>
             {["Features", "Stories", "FAQ"].map((l) => (
-              <a key={l} href={`#${l.toLowerCase()}`} onClick={scrollTo(l.toLowerCase())} style={{ fontSize: 15, color: "#c8d0df", textDecoration: "none", fontWeight: 400, cursor: "pointer" }}>{l}</a>
+              <a key={l} href={`#${l.toLowerCase()}`} onClick={scrollTo(l.toLowerCase())} style={{ fontSize: 15, color: "#f4f1ea", textDecoration: "none", fontWeight: 400, cursor: "pointer" }}>{l}</a>
             ))}
           </div>
         )}
@@ -333,17 +323,28 @@ export default function EtherLanding() {
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)",
-              borderRadius: 999, padding: "8px 18px", fontSize: 13, color: "#3b82f6", fontWeight: 500, marginBottom: 40,
+              borderRadius: 999, padding: "8px 18px", fontSize: 13, color: "#3b82f6", fontWeight: 500, marginBottom: 28,
             }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#3b82f6", animation: "pulse 2s ease infinite" }} />
-              MVP Live — Building in Public
+              Founding Member access — limited to 1,000
             </div>
+          </Reveal>
+
+          <Reveal delay={0.05}>
+            <p style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontStyle: "italic", fontWeight: 400, color: "#94a3b8",
+              fontSize: "clamp(16px, 1.7vw, 20px)", lineHeight: 1.5,
+              marginBottom: 24,
+            }}>
+              The vault for the most valuable thing you've ever built.
+            </p>
           </Reveal>
 
           <Reveal delay={0.1}>
             <h1 style={{
               fontFamily: "'Sora', sans-serif", fontWeight: 700, textTransform: "uppercase",
-              fontSize: "clamp(32px, 5.6vw, 58px)", color: "#fff", lineHeight: 1.05,
+              fontSize: "clamp(32px, 5.6vw, 58px)", color: "#f4f1ea", lineHeight: 1.05,
               letterSpacing: "-0.02em", maxWidth: 900,
             }}>
               Your mind is the most valuable thing you'll ever build
@@ -351,8 +352,8 @@ export default function EtherLanding() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <p style={{ fontSize: 17, color: "#64748b", fontWeight: 300, lineHeight: 1.7, maxWidth: 500, marginTop: 24 }}>
-              Ether preserves how you think, decide, and reason — so your intelligence lives on long after you do.
+            <p style={{ fontSize: 17, color: "#94a3b8", fontWeight: 300, lineHeight: 1.7, maxWidth: 500, marginTop: 24 }}>
+              Ether preserves how you think, decide, and reason — so your intelligence is never lost.
             </p>
           </Reveal>
 
@@ -363,14 +364,14 @@ export default function EtherLanding() {
                 padding: "14px 28px", borderRadius: 10, textDecoration: "none",
                 boxShadow: "0 0 24px rgba(59,130,246,0.25)", transition: "all 0.2s", cursor: "pointer",
               }}>
-                Preserve My Intelligence →
+                Build My Ether →
               </a>
               <a href="#features" onClick={scrollTo("features")} style={{
-                fontSize: 15, fontWeight: 500, color: "#c8d0df",
+                fontSize: 15, fontWeight: 500, color: "#f4f1ea",
                 padding: "14px 28px", borderRadius: 10, textDecoration: "none",
                 border: "1px solid rgba(255,255,255,0.08)", transition: "all 0.2s", cursor: "pointer",
               }}>
-                How It Works
+                See The Framework
               </a>
             </div>
           </Reveal>
@@ -403,7 +404,7 @@ export default function EtherLanding() {
                     display: "flex", flexDirection: "column", alignItems: "center",
                   }}>
                     <IconComp size={24} style={{ color: "#ef4444", opacity: 0.7, marginBottom: 14, display: "block" }} />
-                    <p style={{ fontSize: 14, color: "#64748b", fontWeight: 300, lineHeight: 1.6, marginBottom: 10 }}>{card.text}</p>
+                    <p style={{ fontSize: 14, color: "#94a3b8", fontWeight: 300, lineHeight: 1.6, marginBottom: 10 }}>{card.text}</p>
                     <span style={{ color: "#ef4444", fontWeight: 600, fontSize: 14 }}>Gone.</span>
                   </div>
                 </Reveal>
@@ -414,7 +415,7 @@ export default function EtherLanding() {
           <Reveal delay={0.5}>
             <p style={{
               fontFamily: "'Source Serif 4', serif", fontStyle: "italic",
-              fontSize: 17, color: "#64748b", maxWidth: 600, marginTop: 48, lineHeight: 1.7,
+              fontSize: 17, color: "#94a3b8", maxWidth: 600, marginTop: 48, lineHeight: 1.7,
             }}>
               The largest, most consistent loss of intelligence in human history. Until now.
             </p>
@@ -427,7 +428,7 @@ export default function EtherLanding() {
           <Reveal delay={0.1}>
             <h2 style={{
               fontFamily: "'Sora', sans-serif", fontWeight: 700, textTransform: "uppercase",
-              fontSize: "clamp(24px, 4vw, 40px)", color: "#fff", lineHeight: 1.2,
+              fontSize: "clamp(24px, 4vw, 40px)", color: "#f4f1ea", lineHeight: 1.2,
               letterSpacing: "-0.01em",
             }}>
               NOT A SCRAPBOOK. NOT A CHATBOT.<br />
@@ -456,7 +457,7 @@ export default function EtherLanding() {
             {heading("THIS ISN'T ABOUT DYING. IT'S ABOUT BUILDING SOMETHING EXTRAORDINARY WHILE YOU'RE ALIVE.")}
           </Reveal>
           <Reveal delay={0.2}>
-            <p style={{ fontSize: 15, color: "#64748b", fontWeight: 300, lineHeight: 1.8, maxWidth: 540, marginTop: 24 }}>
+            <p style={{ fontSize: 15, color: "#94a3b8", fontWeight: 300, lineHeight: 1.8, maxWidth: 540, marginTop: 24 }}>
               The daily reflection makes you sharper. Clearer on who you are, what you believe, and how you think. The legacy is what it becomes after. The value is what it gives you now.
             </p>
           </Reveal>
@@ -481,8 +482,8 @@ export default function EtherLanding() {
                     borderTop: `3px solid ${s.color}`,
                   }}>
                     <IconComp size={22} style={{ color: s.color, marginBottom: 16 }} />
-                    <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 12 }}>{s.title}</h3>
-                    <p style={{ fontSize: 14, color: "#64748b", fontWeight: 300, lineHeight: 1.8 }}>{s.text}</p>
+                    <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 17, color: "#f4f1ea", marginBottom: 12 }}>{s.title}</h3>
+                    <p style={{ fontSize: 14, color: "#94a3b8", fontWeight: 300, lineHeight: 1.8 }}>{s.text}</p>
                   </div>
                 </Reveal>
               );
@@ -503,7 +504,7 @@ export default function EtherLanding() {
                   <MessageCircle size={20} style={{ color: "#3b82f6", marginBottom: 18 }} />
                   <p style={{
                     fontFamily: "'Source Serif 4', serif", fontStyle: "italic",
-                    fontSize: 15, color: "#c8d0df", lineHeight: 1.75, marginBottom: 18,
+                    fontSize: 15, color: "#f4f1ea", lineHeight: 1.75, marginBottom: 18,
                   }}>
                     "{t.quote}"
                   </p>
@@ -547,7 +548,7 @@ export default function EtherLanding() {
           <Reveal delay={0.1}>
             <h2 style={{
               fontFamily: "'Sora', sans-serif", fontWeight: 700, textTransform: "uppercase",
-              fontSize: "clamp(28px, 5vw, 42px)", color: "#fff", lineHeight: 1.15,
+              fontSize: "clamp(28px, 5vw, 42px)", color: "#f4f1ea", lineHeight: 1.15,
               letterSpacing: "-0.01em",
             }}>
               Your intelligence is worth preserving
@@ -566,10 +567,10 @@ export default function EtherLanding() {
                 background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.15)",
                 maxWidth: 420,
               }}>
-                <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 22, color: "#fff", marginBottom: 8 }}>
+                <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 22, color: "#f4f1ea", marginBottom: 8 }}>
                   You're in.
                 </h3>
-                <p style={{ fontSize: 14, color: "#64748b", fontWeight: 300 }}>
+                <p style={{ fontSize: 14, color: "#94a3b8", fontWeight: 300 }}>
                   We'll reach out with early access details.
                 </p>
               </div>
@@ -585,7 +586,7 @@ export default function EtherLanding() {
                     style={{
                       flex: "1 1 240px", padding: "14px 18px",
                       background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 10, color: "#c8d0df", fontSize: 14,
+                      borderRadius: 10, color: "#f4f1ea", fontSize: 14,
                       fontFamily: "'Sora', sans-serif", outline: "none",
                     }}
                     onFocus={(e) => { e.target.style.borderColor = "rgba(59,130,246,0.4)"; e.target.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.1)"; }}
@@ -625,7 +626,7 @@ export default function EtherLanding() {
           padding: "48px 32px", textAlign: "center",
           borderTop: "1px solid rgba(255,255,255,0.04)",
         }}>
-          <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 18, color: "#fff", letterSpacing: "-0.03em" }}>
+          <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 18, color: "#f4f1ea", letterSpacing: "-0.03em" }}>
             Ether
           </div>
           <p style={{ fontSize: 13, color: "#64748b", fontWeight: 300, marginTop: 8 }}>
