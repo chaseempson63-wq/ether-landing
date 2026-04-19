@@ -162,6 +162,95 @@ const FAQItem = ({ question, answer, isLast }) => {
   );
 };
 
+/* ─── Hero Figure ─── */
+const HeroFigure = () => (
+  <div style={{
+    marginTop: 32,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+  }}>
+    <style>{`
+      .hero-figure-image  { width: 280px; max-width: 100%; aspect-ratio: 1 / 1.3; }
+      .hero-figure-track  { width: 160px; }
+      .hero-figure-metric { font-size: 14px; }
+      @media (min-width: 768px) {
+        .hero-figure-image  { width: 400px; }
+        .hero-figure-track  { width: 200px; }
+        .hero-figure-metric { font-size: 16px; }
+      }
+    `}</style>
+
+    <div className="hero-figure-image">
+      {/* TODO(hero-figure): replace this <svg> with <img src="/hero-figure.png" alt="A figure being built from luminous geometric blocks — the Ether takes shape" width={400} height={520} loading="eager" style={{ width:'100%', height:'auto' }} /> when final image lands. */}
+      <svg viewBox="0 0 200 260" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style={{ display: "block" }}>
+        {/* silhouette outline */}
+        <circle cx="100" cy="42" r="22" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" />
+        <path d="M55 92 Q100 70 145 92" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" strokeLinecap="round" />
+        <rect x="60" y="92" width="80" height="100" rx="14" ry="14" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" />
+        <line x1="55" y1="100" x2="55" y2="180" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" strokeLinecap="round" />
+        <line x1="145" y1="100" x2="145" y2="180" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" strokeLinecap="round" />
+        <line x1="82" y1="192" x2="82" y2="245" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" strokeLinecap="round" />
+        <line x1="118" y1="192" x2="118" y2="245" stroke="#3b82f6" strokeWidth="1.5" strokeOpacity="0.25" strokeLinecap="round" />
+
+        {/* core squares — densest in torso, sparser at limbs and head */}
+        <rect x="94" y="30" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="48" y="124" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="140" y="124" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="84" y="104" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="104" y="104" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="68" y="120" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="88" y="120" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="108" y="120" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="124" y="120" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="76" y="136" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="96" y="136" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="116" y="136" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="68" y="152" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="88" y="152" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="108" y="152" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="124" y="152" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="80" y="168" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="100" y="168" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="120" y="168" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="80" y="200" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+        <rect x="108" y="200" width="12" height="12" fill="#3b82f6" opacity="0.7" />
+
+        {/* floating pieces above head — partially-built, lower opacity */}
+        <rect x="60" y="4" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="90" y="2" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="122" y="6" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="140" y="12" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="52" y="14" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="104" y="16" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="74" y="22" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="134" y="26" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="38" y="32" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+        <rect x="158" y="30" width="8" height="8" fill="#3b82f6" opacity="0.25" />
+      </svg>
+    </div>
+
+    <div className="hero-figure-metric" style={{
+      marginTop: 12,
+      fontFamily: "'Sora', sans-serif",
+      fontWeight: 500,
+      color: "#f4f1ea",
+    }}>
+      You are <span style={{ color: "#3b82f6" }}>42% preserved</span>
+    </div>
+
+    <div className="hero-figure-track" style={{
+      marginTop: 16,
+      height: 2,
+      background: "rgba(255,255,255,0.08)",
+      borderRadius: 1,
+    }}>
+      <div style={{ width: "42%", height: "100%", background: "#3b82f6", borderRadius: 1 }} />
+    </div>
+  </div>
+);
+
 /* ═══════════════════════ MAIN PAGE ═══════════════════════ */
 export default function EtherLanding() {
   const [scrolled, setScrolled] = useState(false);
@@ -355,6 +444,10 @@ export default function EtherLanding() {
             <p style={{ fontSize: 17, color: "#94a3b8", fontWeight: 300, lineHeight: 1.7, maxWidth: 500, marginTop: 24 }}>
               Ether preserves how you think, decide, and reason — so your intelligence is never lost.
             </p>
+          </Reveal>
+
+          <Reveal delay={0.25}>
+            <HeroFigure />
           </Reveal>
 
           <Reveal delay={0.3}>
