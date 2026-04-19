@@ -22,6 +22,58 @@ const injectStyles = () => {
     html { scroll-behavior: smooth; scroll-padding-top: 80px; }
     body { font-family: 'Sora', sans-serif; background: #080b14; color: #f4f1ea; -webkit-font-smoothing: antialiased; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+    /* ── Hero Figure (voxel sphere + bust scene) ── */
+    @keyframes hf-spin {
+      from { transform: translate(-50%,-50%) rotateX(-14deg) rotateY(-24deg); }
+      to   { transform: translate(-50%,-50%) rotateX(-14deg) rotateY(336deg); }
+    }
+    .hf-block {
+      position: absolute; left: 0; top: 0;
+      width: var(--s, 24px); height: var(--s, 24px);
+      transform-style: preserve-3d;
+      transform: translate3d(var(--x), var(--y), var(--z))
+                 rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg));
+    }
+    .hf-block .hf-face { position: absolute; inset: 0; background: #0b1120; border: 1px solid rgba(148,163,184,0.14); }
+    .hf-block .hf-front { transform: translateZ(calc(var(--s) / 2)); }
+    .hf-block .hf-back  { transform: translateZ(calc(var(--s) / -2)) rotateY(180deg); }
+    .hf-block .hf-right { transform: rotateY(90deg)  translateZ(calc(var(--s) / 2)); }
+    .hf-block .hf-left  { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
+    .hf-block .hf-top   { transform: rotateX(90deg)  translateZ(calc(var(--s) / 2)); }
+    .hf-block .hf-bot   { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
+    .hf-block.hf-lit .hf-face { background: #3b82f6; border: 1px solid #60a5fa; }
+    .hf-block.hf-lit .hf-right,
+    .hf-block.hf-lit .hf-left,
+    .hf-block.hf-lit .hf-back  { background: #1d4ed8; border-color: #3b82f6; }
+    .hf-block.hf-lit .hf-bot   { background: #1e3a8a; border-color: rgba(59,130,246,0.4); }
+
+    .hf-twin-glow {
+      position: absolute; inset: -32px;
+      background: radial-gradient(circle at 50% 50%,
+        rgba(59,130,246,0.32) 0%, rgba(59,130,246,0.08) 45%, transparent 70%);
+      filter: blur(18px);
+      z-index: 0; pointer-events: none;
+    }
+    .hf-shadow {
+      position: absolute; left: 50%; top: calc(50% + 165px);
+      width: 280px; height: 32px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 70%);
+      filter: blur(5px);
+      z-index: 1; pointer-events: none;
+    }
+    .hf-flyer {
+      position: absolute; left: 0; top: 0;
+      width: 12px; height: 12px;
+      background: linear-gradient(180deg, #93c5fd, #3b82f6 55%, #1d4ed8);
+      border: 1px solid rgba(191,219,254,0.95);
+      box-shadow: 0 0 12px rgba(59,130,246,0.9), inset 0 0 6px rgba(255,255,255,0.45);
+      pointer-events: none; z-index: 4;
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+      will-change: transform, opacity, left, top;
+    }
   `;
   document.head.appendChild(style);
 };
@@ -41,6 +93,20 @@ const useInView = (options = {}) => {
     return () => obs.disconnect();
   }, []);
   return [ref, isInView];
+};
+
+/* ─── usePrefersReducedMotion hook ─── */
+const usePrefersReducedMotion = () => {
+  const [prefers, setPrefers] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefers(mq.matches);
+    const handler = (e) => setPrefers(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return prefers;
 };
 
 /* ─── Reveal wrapper ─── */
@@ -157,6 +223,163 @@ const FAQItem = ({ question, answer, isLast }) => {
         <p style={{ fontSize: 14, color: "#94a3b8", fontWeight: 300, lineHeight: 1.8, paddingBottom: 20 }}>
           {answer}
         </p>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Hero Figure (voxel sphere + bust, static ~45% lit) ─── */
+const HeroFigure = () => {
+  const reducedMotion = usePrefersReducedMotion();
+  const sceneRef  = useRef(null);
+  const stageRef  = useRef(null);
+  const sphereRef = useRef(null);
+
+  // Fluid scaling: stage is fixed 700x400, scene height/transform tracks container width
+  useEffect(() => {
+    const apply = () => {
+      const scene = sceneRef.current;
+      const stage = stageRef.current;
+      if (!scene || !stage) return;
+      const STAGE_W = 700, STAGE_H = 400;
+      const w = scene.clientWidth;
+      const scale = Math.min(1, w / STAGE_W);
+      stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      scene.style.height = (STAGE_H * scale) + "px";
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, []);
+
+  // Build sphere once with a static ~45% lit state
+  useEffect(() => {
+    const sphere = sphereRef.current;
+    const scene  = sceneRef.current;
+    if (!sphere || !scene) return;
+
+    // Geometry — aggressively reduced from prototype for embedded perf
+    // (218 cubes tanked FPS; ~100 cubes targets sustained 60fps)
+    const R = 100, S = 24, LAT = 6;
+    const points = [];
+    for (let i = 1; i < LAT; i++) {
+      const theta = Math.PI * (i / LAT);
+      const r = Math.sin(theta);
+      const y = Math.cos(theta) * R;
+      const circumference = 2 * Math.PI * r * R;
+      const LON = Math.max(6, Math.round(circumference / S));
+      const phiOffset = (i % 2) * Math.PI / LON;
+      for (let k = 0; k < LON; k++) {
+        const phi = phiOffset + (2 * Math.PI) * (k / LON);
+        const x = Math.cos(phi) * r * R;
+        const z = Math.sin(phi) * r * R;
+        points.push({ x, y, z });
+      }
+    }
+    points.push({ x: 0, y:  R, z: 0 });
+    points.push({ x: 0, y: -R, z: 0 });
+
+    const blockEls = points.map((p) => {
+      const el = document.createElement("div");
+      el.className = "hf-block";
+      const ry = Math.atan2(p.x, p.z) * 180 / Math.PI;
+      const rx = Math.asin(p.y / Math.hypot(p.x, p.y, p.z)) * 180 / Math.PI;
+      el.style.setProperty("--s", S + "px");
+      el.style.setProperty("--x", p.x + "px");
+      el.style.setProperty("--y", p.y + "px");
+      el.style.setProperty("--z", p.z + "px");
+      el.style.setProperty("--ry", ry + "deg");
+      el.style.setProperty("--rx", (-rx) + "deg");
+      el.innerHTML = '<div class="hf-face hf-front"></div><div class="hf-face hf-back"></div><div class="hf-face hf-right"></div><div class="hf-face hf-left"></div><div class="hf-face hf-top"></div><div class="hf-face hf-bot"></div>';
+      sphere.appendChild(el);
+      return el;
+    });
+
+    // Deterministic ordering (low-frequency noise score) — gives a coherent
+    // "lit cluster" rather than random pepper. Seed = 0.4242 for stable layout.
+    const score = (p) =>
+      Math.sin(p.x * 0.018 + 1.3) +
+      Math.sin(p.y * 0.022 - 0.7) +
+      Math.sin(p.z * 0.019 + 2.1) +
+      Math.sin((p.x + p.y) * 0.011) +
+      Math.sin((p.y + p.z) * 0.013 + 1.1);
+    let seed = 0.4242;
+    const pseudoRand = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+    const order = points
+      .map((p, i) => ({ i, s: score(p) + (pseudoRand() - 0.5) * 0.6 }))
+      .sort((a, b) => a.s - b.s)
+      .map((o) => o.i);
+
+    const N = points.length;
+    const litCount = Math.round(N * 0.45);
+    for (let i = 0; i < litCount; i++) blockEls[order[i]].classList.add("hf-lit");
+
+    return () => { blockEls.forEach((el) => el.remove()); };
+  }, []);
+
+  // Pause CSS rotation when scene scrolls out of view (still cheap, but polite)
+  useEffect(() => {
+    if (reducedMotion) return;
+    const scene = sceneRef.current;
+    const sphere = sphereRef.current;
+    if (!scene || !sphere) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { sphere.style.animationPlayState = entry.isIntersecting ? "running" : "paused"; },
+      { threshold: 0 }
+    );
+    obs.observe(scene);
+    return () => obs.disconnect();
+  }, [reducedMotion]);
+
+  return (
+    <div ref={sceneRef} style={{
+      position: "relative",
+      width: "min(700px, calc(100vw - 64px))",
+      margin: "32px auto 40px",
+      overflow: "hidden",
+    }}>
+      <div ref={stageRef} style={{
+        position: "absolute",
+        left: "50%", top: "50%",
+        width: 700, height: 400,
+        transformOrigin: "center center",
+        transform: "translate(-50%, -50%) scale(1)",
+      }}>
+        {/* Bust on left */}
+        <div aria-hidden="true" style={{
+          position: "absolute", left: "8%", top: "50%",
+          width: 200, transform: "translateY(-50%)", zIndex: 3,
+        }}>
+          <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" style={{ display: "block", width: "100%", height: "auto", overflow: "visible" }}>
+            <circle cx="100" cy="78" r="22" fill="none" stroke="#f4f1ea" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+            <path d="M 36 170 Q 100 118, 164 170" fill="none" stroke="#f4f1ea" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+          </svg>
+        </div>
+        {/* Sphere on right */}
+        <div aria-hidden="true" style={{
+          position: "absolute", right: "8%", top: "50%",
+          width: 320, height: 320,
+          transform: "translateY(-50%)",
+          transformStyle: "preserve-3d",
+          zIndex: 2,
+          perspective: 1400,
+          perspectiveOrigin: "50% 45%",
+        }}>
+          <div className="hf-twin-glow" />
+          <div className="hf-shadow" />
+          <div ref={sphereRef} style={{
+            position: "absolute",
+            left: "50%", top: "50%",
+            width: 0, height: 0,
+            transformStyle: "preserve-3d",
+            transform: "translate(-50%, -50%) rotateX(-14deg) rotateY(-24deg)",
+            animation: reducedMotion ? "none" : "hf-spin 56s linear infinite",
+            willChange: "transform",
+          }} />
+        </div>
       </div>
     </div>
   );
@@ -599,6 +822,10 @@ export default function EtherLanding() {
             <p style={{ fontSize: 17, color: "#94a3b8", fontWeight: 300, lineHeight: 1.7, maxWidth: 500, marginTop: 24 }}>
               Ether preserves how you think, decide, and reason — so your intelligence is never lost.
             </p>
+          </Reveal>
+
+          <Reveal delay={0.25}>
+            <HeroFigure />
           </Reveal>
 
           <Reveal delay={0.3}>
