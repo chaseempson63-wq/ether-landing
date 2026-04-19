@@ -127,29 +127,6 @@ const Reveal = ({ children, delay = 0, className = "", y = 30 }) => {
   );
 };
 
-/* ─── Stat Block ─── */
-const StatBlock = ({ number, label, delay = 0 }) => {
-  const [ref, isInView] = useInView();
-  return (
-    <div
-      ref={ref}
-      className="text-center"
-      style={{
-        opacity: isInView ? 1 : 0,
-        transform: isInView ? "scale(1)" : "scale(0.85)",
-        transition: `all 0.6s cubic-bezier(.16,1,.3,1) ${delay}s`,
-      }}
-    >
-      <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 48, color: "#f4f1ea", lineHeight: 1 }}>
-        {number}
-      </div>
-      <div style={{ fontSize: 13, color: "#64748b", fontWeight: 300, marginTop: 8, letterSpacing: "0.04em" }}>
-        {label}
-      </div>
-    </div>
-  );
-};
-
 /* ─── Feature Card ─── */
 const FeatureCard = ({ icon, title, description, delay = 0 }) => {
   const [hovered, setHovered] = useState(false);
@@ -846,14 +823,6 @@ export default function EtherLanding() {
               </a>
             </div>
           </Reveal>
-        </section>
-
-        {/* ═══ STATS BAR ═══ */}
-        <section style={{ borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "48px 32px" }}>
-          <div style={{ maxWidth: 600, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
-            <StatBlock number="5" label="Identity Layers" delay={0} />
-            <StatBlock number="15m" label="Per Day" delay={0.15} />
-          </div>
         </section>
 
         {/* ═══ THE PROBLEM ═══ */}
