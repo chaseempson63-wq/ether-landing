@@ -13,7 +13,7 @@ const injectStyles = () => {
   link.id = "ether-fonts";
   link.rel = "stylesheet";
   link.href =
-    "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Source+Serif+4:ital,wght@1,400;1,600&display=swap";
+    "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,400;1,400;1,600&display=swap";
   document.head.appendChild(link);
 
   const style = document.createElement("style");
@@ -159,6 +159,250 @@ const FAQItem = ({ question, answer, isLast }) => {
         </p>
       </div>
     </div>
+  );
+};
+
+/* ─── Roadmap ─── */
+const Roadmap = () => {
+  const phases = [
+    {
+      label: "Phase One",
+      trigger: "At 1,000 Founding Members",
+      name: "The Foundation",
+      description: "Ether launches. Founding Members get lifetime access at the founding price, unlimited sessions across all five Halliday layers, and three beneficiary seats. The vault opens.",
+      milestones: [
+        "Full Halliday interview flow — all five layers",
+        "Graph memory architecture — your mind, preserved",
+        "Founding Member access — lifetime pricing locked",
+      ],
+    },
+    {
+      label: "Phase Two",
+      trigger: "At 60% Halliday Completeness",
+      name: "The Mind Alive",
+      description: "Once a mind is deep enough to hold its own, it becomes a mind you can talk to. Voice, presence, and conversation unlock — your Ether stops being an archive and starts being alive.",
+      milestones: [
+        "Voice cloning — your Ether speaks in your voice",
+        "Conversational avatar — real-time dialogue with your preserved mind",
+        "Mobile app — your Ether in your pocket",
+      ],
+    },
+    {
+      label: "Phase Three",
+      trigger: "At 10,000 users",
+      name: "The Legacy Network",
+      description: "Ether becomes more than a personal vault. Beneficiaries inherit your mind. Public Ethers join the marketplace. Intelligence compounds across generations — and revenue flows back to the minds that built it.",
+      milestones: [
+        "Beneficiary system — designate who inherits your Ether",
+        "Marketplace launch — public Ethers become queryable",
+        "Generational royalty inheritance — your mind keeps earning",
+      ],
+    },
+  ];
+
+  const [activePhase, setActivePhase] = useState(0);
+  const phaseRefs = useRef([null, null, null]);
+  const phasesContainerRef = useRef(null);
+  const [rail, setRail] = useState({ top: 0, height: 0, fill: 0 });
+  const NODE_TOP_OFFSET = 10; // node center y within each phase block
+
+  // Active phase tracking — IntersectionObserver scroll-spy at viewport center
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = phaseRefs.current.findIndex((r) => r === entry.target);
+            if (idx !== -1) setActivePhase(idx);
+          }
+        });
+      },
+      { rootMargin: "-50% 0px -50% 0px" }
+    );
+    phaseRefs.current.forEach((r) => r && obs.observe(r));
+    return () => obs.disconnect();
+  }, []);
+
+  // Measure rail position + fill height (re-measure on activePhase, resize, font load)
+  useEffect(() => {
+    const measure = () => {
+      const first = phaseRefs.current[0];
+      const last = phaseRefs.current[2];
+      const active = phaseRefs.current[activePhase];
+      if (!first || !last || !active) return;
+      const top = first.offsetTop + NODE_TOP_OFFSET;
+      const bottom = last.offsetTop + NODE_TOP_OFFSET;
+      const fill = active.offsetTop + NODE_TOP_OFFSET - top;
+      setRail({ top, height: bottom - top, fill });
+    };
+    measure();
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure);
+    }
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [activePhase]);
+
+  const nodeStyle = (i) => {
+    const isActive = i === activePhase;
+    const isCompleted = i < activePhase;
+    if (isActive) {
+      return { width: 14, height: 14, background: "#3b82f6", opacity: 1, border: "0px solid transparent" };
+    }
+    if (isCompleted) {
+      return { width: 14, height: 14, background: "#3b82f6", opacity: 0.6, border: "0px solid transparent" };
+    }
+    return { width: 10, height: 10, background: "transparent", opacity: 1, border: "1.5px solid rgba(59,130,246,0.3)" };
+  };
+
+  return (
+    <section style={{ padding: "96px 32px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <style>{`
+        .roadmap-container { max-width: 720px; width: 100%; }
+        .roadmap-phase     { padding-left: 64px; }
+        .roadmap-phase + .roadmap-phase { margin-top: 96px; }
+        .roadmap-rail      { left: 32px; }
+        .roadmap-node      { left: 33px; }
+        .roadmap-name      { font-size: 32px; }
+        .roadmap-desc      { font-size: 18px; }
+        @media (max-width: 767px) {
+          .roadmap-phase   { padding-left: 44px; }
+          .roadmap-phase + .roadmap-phase { margin-top: 64px; }
+          .roadmap-rail    { left: 20px; }
+          .roadmap-node    { left: 21px; }
+          .roadmap-name    { font-size: 24px; }
+          .roadmap-desc    { font-size: 16px; }
+        }
+      `}</style>
+
+      {/* Section header */}
+      <Reveal>
+        <div style={{
+          fontSize: 11, textTransform: "uppercase", letterSpacing: "0.2em",
+          color: "#64748b", fontWeight: 600, marginBottom: 16, textAlign: "center",
+        }}>
+          The Roadmap
+        </div>
+      </Reveal>
+      <Reveal delay={0.1}>
+        <h2 style={{
+          fontFamily: "'Sora', sans-serif", fontWeight: 500,
+          fontSize: "clamp(26px, 3.6vw, 38px)", color: "#f4f1ea",
+          lineHeight: 1.2, letterSpacing: "-0.01em", maxWidth: 720,
+          textAlign: "center",
+        }}>
+          Built in phases. Designed to last generations.
+        </h2>
+      </Reveal>
+      <Reveal delay={0.2}>
+        <p style={{
+          fontSize: 17, color: "#94a3b8", fontWeight: 300, lineHeight: 1.7,
+          maxWidth: 600, marginTop: 24, textAlign: "center",
+        }}>
+          Ether doesn't ship everything at once. Each phase unlocks when we reach the milestone that earns it — patient by design.
+        </p>
+      </Reveal>
+
+      {/* Phases */}
+      <div ref={phasesContainerRef} className="roadmap-container" style={{ position: "relative", marginTop: 80, textAlign: "left" }}>
+        {/* Rail background */}
+        <div className="roadmap-rail" aria-hidden="true" style={{
+          position: "absolute",
+          top: rail.top, width: 2, height: rail.height,
+          background: "rgba(255,255,255,0.08)",
+          transform: "translateX(-50%)",
+        }} />
+        {/* Rail fill */}
+        <div className="roadmap-rail" aria-hidden="true" style={{
+          position: "absolute",
+          top: rail.top, width: 2, height: rail.fill,
+          background: "#3b82f6", opacity: 0.6,
+          transform: "translateX(-50%)",
+          transition: "height 400ms ease",
+        }} />
+
+        {phases.map((p, i) => {
+          const isActive = i === activePhase;
+          return (
+            <div
+              key={i}
+              ref={(el) => (phaseRefs.current[i] = el)}
+              className="roadmap-phase"
+              style={{ position: "relative" }}
+            >
+              {/* Node */}
+              <div className="roadmap-node" aria-hidden="true" style={{
+                position: "absolute",
+                top: NODE_TOP_OFFSET,
+                borderRadius: "50%",
+                transform: "translate(-50%, -50%)",
+                transition: "all 400ms ease",
+                ...nodeStyle(i),
+              }} />
+
+              {/* Phase label + Unlock trigger */}
+              <div style={{ display: "flex", gap: 16, alignItems: "baseline", flexWrap: "wrap", marginBottom: 12 }}>
+                <span style={{
+                  fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 500,
+                  color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em",
+                }}>
+                  {p.label}
+                </span>
+                <span style={{
+                  fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 400, color: "#3b82f6",
+                }}>
+                  {p.trigger}
+                </span>
+              </div>
+
+              {/* Milestone name */}
+              <h3 className="roadmap-name" style={{
+                fontFamily: "'Sora', sans-serif", fontWeight: 500,
+                color: "#f4f1ea", lineHeight: 1.2, letterSpacing: "-0.01em",
+                opacity: isActive ? 1 : 0.35,
+                transition: "opacity 400ms ease",
+                marginBottom: 16,
+              }}>
+                {p.name}
+              </h3>
+
+              {/* Description */}
+              <p className="roadmap-desc" style={{
+                fontFamily: "'Source Serif 4', Georgia, serif", fontWeight: 400,
+                color: "#94a3b8", lineHeight: 1.7,
+                opacity: isActive ? 1 : 0.35,
+                transition: "opacity 400ms ease",
+                marginBottom: 24,
+              }}>
+                {p.description}
+              </p>
+
+              {/* Milestones list */}
+              <ul style={{
+                listStyle: "none", padding: 0, margin: 0,
+                opacity: isActive ? 1 : 0.35,
+                transition: "opacity 400ms ease",
+              }}>
+                {p.milestones.map((m, j) => (
+                  <li key={j} style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
+                    <span aria-hidden="true" style={{
+                      width: 4, height: 4, background: "#3b82f6",
+                      flexShrink: 0, marginTop: 11,
+                    }} />
+                    <span style={{
+                      fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 400,
+                      color: "#f4f1ea", lineHeight: 1.8,
+                    }}>
+                      {m}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 };
 
@@ -514,6 +758,9 @@ export default function EtherLanding() {
             ))}
           </div>
         </section>
+
+        {/* ═══ ROADMAP ═══ */}
+        <Roadmap />
 
         {/* ═══ FAQ ═══ */}
         <section id="faq" style={{ padding: "96px 32px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
