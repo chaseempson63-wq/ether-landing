@@ -3,7 +3,8 @@ import { supabase } from "./lib/supabase";
 import {
   Mic, Fingerprint, Brain, Shield, Users, Lock,
   Sparkles, Heart, BookOpen, Zap, Lightbulb,
-  MessageCircle, ChevronRight, Menu, X
+  MessageCircle, ChevronRight, Menu, X,
+  Rocket, Gift, Crown
 } from "lucide-react";
 
 /* ─── Google Fonts + Global Reset ─── */
@@ -1071,6 +1072,138 @@ export default function EtherLanding() {
               </div>
             )}
           </Reveal>
+        </section>
+
+        {/* ═══ FOUNDERS CLUB ═══ */}
+        <section id="founders" style={{
+          padding: "72px 32px", textAlign: "center",
+          display: "flex", flexDirection: "column", alignItems: "center",
+          borderTop: "1px solid rgba(255,255,255,0.04)",
+          position: "relative",
+        }}>
+          <div style={{
+            position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+            width: 600, height: 600, borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(59,130,246,0.05), transparent 70%)",
+            pointerEvents: "none",
+          }} />
+
+          <div style={{
+            position: "relative", zIndex: 1,
+            maxWidth: 720, width: "100%",
+            borderRadius: 20, padding: "clamp(32px, 5vw, 56px) clamp(24px, 4vw, 48px)",
+            background: "rgba(255,255,255,0.03)", backdropFilter: "blur(20px)",
+            border: "1px solid rgba(59,130,246,0.18)",
+            boxShadow: "0 0 60px rgba(59,130,246,0.06)",
+          }}>
+            <Reveal>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.18)",
+                borderRadius: 999, padding: "7px 16px", fontSize: 11,
+                color: "#3b82f6", fontWeight: 600, marginBottom: 24,
+                textTransform: "uppercase", letterSpacing: "0.18em",
+              }}>
+                <Crown size={13} style={{ color: "#3b82f6" }} />
+                Limited to 100
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.05}>
+              <h2 style={{
+                fontFamily: "'Sora', sans-serif", fontWeight: 700, textTransform: "uppercase",
+                fontSize: "clamp(28px, 4.5vw, 42px)", color: "#f4f1ea", lineHeight: 1.15,
+                letterSpacing: "-0.01em", marginBottom: 18,
+              }}>
+                Join the Founders Club
+              </h2>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <p style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontStyle: "italic", fontWeight: 400, color: "#94a3b8",
+                fontSize: "clamp(15px, 1.6vw, 17px)", lineHeight: 1.6,
+                maxWidth: 520, margin: "0 auto",
+              }}>
+                Help build the future of human intelligence. Get in before everyone else.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: 20, marginTop: 40, textAlign: "left",
+              }}>
+                {[
+                  { icon: Rocket, text: "Early access before the public waitlist" },
+                  { icon: MessageCircle, text: "Direct line to the founder — you shape what gets built" },
+                  { icon: Gift, text: "$29 credited toward your first year subscription" },
+                  { icon: Crown, text: "Founders Club status for life" },
+                ].map((perk, i) => {
+                  const IconComp = perk.icon;
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                      <div style={{
+                        flexShrink: 0,
+                        width: 36, height: 36, borderRadius: 10,
+                        background: "rgba(59,130,246,0.08)",
+                        border: "1px solid rgba(59,130,246,0.18)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        <IconComp size={16} style={{ color: "#3b82f6" }} />
+                      </div>
+                      <p style={{
+                        fontSize: 14, color: "#cbd5e1", fontWeight: 300,
+                        lineHeight: 1.55, paddingTop: 8,
+                      }}>
+                        {perk.text}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <div style={{
+                marginTop: 40, paddingTop: 32,
+                borderTop: "1px solid rgba(255,255,255,0.06)",
+              }}>
+                <p style={{
+                  fontFamily: "'Sora', sans-serif", fontWeight: 600,
+                  fontSize: 18, color: "#f4f1ea", letterSpacing: "-0.01em",
+                  marginBottom: 24,
+                }}>
+                  $29 USD <span style={{ color: "#64748b", fontWeight: 400 }}>— one time</span>
+                </p>
+
+                <a
+                  href="https://buy.stripe.com/28E28k1mAdFf5zy7VV0co00"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-block",
+                    fontSize: 15, fontWeight: 600, color: "#fff", background: "#3b82f6",
+                    padding: "14px 32px", borderRadius: 10, textDecoration: "none",
+                    boxShadow: "0 0 24px rgba(59,130,246,0.25)", transition: "all 0.2s", cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => { e.target.style.background = "#2563eb"; e.target.style.transform = "translateY(-1px)"; }}
+                  onMouseLeave={(e) => { e.target.style.background = "#3b82f6"; e.target.style.transform = "translateY(0)"; }}
+                >
+                  Become a Founder
+                </a>
+
+                <p style={{
+                  fontSize: 12, color: "#64748b", fontWeight: 300,
+                  marginTop: 18, letterSpacing: "0.02em",
+                }}>
+                  Only 100 spots. When they're gone, they're gone.
+                </p>
+              </div>
+            </Reveal>
+          </div>
         </section>
 
         {/* ═══ FOOTER ═══ */}
