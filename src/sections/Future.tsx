@@ -163,7 +163,7 @@ export function Future() {
           constellation has room to breathe horizontally. */}
       <div className="mx-auto w-full max-w-[1400px] px-3 sm:px-6">
         <div
-          className="relative w-full overflow-hidden rounded-2xl h-[320px] sm:h-[420px]"
+          className="relative w-full overflow-hidden rounded-2xl h-[640px] sm:h-[840px]"
           style={{
             background:
               "radial-gradient(60% 60% at 50% 50%, rgba(138,124,255,0.04) 0%, transparent 100%)",
