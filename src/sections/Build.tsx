@@ -296,6 +296,24 @@ export function Build() {
             }}
           />
 
+          {/* Phase 3 gold overlay — when phase 3 lights up, the dot 2 → dot 3
+              segment of the fill transitions from violet to gold to match the
+              dot's color. Layered on top of the cyan/violet fill at the same
+              0.85 opacity, with the same 600ms ease-out fade as the dots. By
+              the time phase 3 lights, scroll progress has already pushed the
+              fill all the way to dot 3, so this overlay sits exactly over the
+              violet section it replaces. */}
+          <div
+            aria-hidden
+            className="absolute left-[7px] w-px transition-opacity duration-[600ms] ease-out"
+            style={{
+              top: `${dotPositions[1] * 100}%`,
+              height: `${(dotPositions[2] - dotPositions[1]) * 100}%`,
+              background: "#FFD27A",
+              opacity: lit[2] ? 0.85 : 0,
+            }}
+          />
+
           {/* Leading-edge glow — soft circle that always sits at the live
               scroll position inside the timeline, even before the fill has
               started. This is the part that makes the timeline feel alive. */}
