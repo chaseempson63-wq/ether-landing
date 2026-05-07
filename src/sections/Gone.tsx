@@ -18,18 +18,18 @@ const CARDS: Card[] = [
 function GoneCard({ icon: Icon, description }: Card) {
   return (
     <div
-      className="rounded-2xl border border-white/[0.06] p-8 flex flex-col items-center text-center"
+      className="aspect-square rounded-2xl border border-white/[0.06] p-4 sm:p-5 flex flex-col items-center text-center"
       style={{ background: "rgba(255,255,255,0.02)" }}
     >
-      <Icon className="h-8 w-8 mb-6" style={{ color: RED }} aria-hidden />
+      <Icon className="h-7 w-7 sm:h-8 sm:w-8 mb-3 sm:mb-4" style={{ color: RED }} aria-hidden />
       <p
-        className="font-[Source_Serif_4,Georgia,serif] leading-[1.5] text-[16px] flex-1 flex items-center"
+        className="font-[Source_Serif_4,Georgia,serif] leading-[1.4] text-[13px] sm:text-[15px] flex-1 flex items-center"
         style={{ color: "#B0B8C6" }}
       >
         {description}
       </p>
       <p
-        className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[18px] mt-6"
+        className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[16px] sm:text-[18px] mt-3 sm:mt-4"
         style={{ color: RED }}
       >
         Gone.
