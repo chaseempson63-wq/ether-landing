@@ -162,7 +162,7 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-12 lg:gap-y-6 mb-8 sm:mb-10">
           {/* Card 1 — Waitlist */}
           <div
             className="rounded-2xl border border-white/10 p-7 sm:p-8 flex flex-col"
@@ -234,6 +234,23 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
             )}
           </div>
 
+          {/* Inter-card heading — sits between the two cards on mobile only;
+              on lg the cards are side-by-side and don't need the marker. */}
+          <div className="lg:hidden text-center">
+            <p
+              className="font-[Inter,system-ui,sans-serif] font-medium text-[11px] tracking-[0.18em] uppercase mb-2"
+              style={{ color: "var(--ether-gold)" }}
+            >
+              The Next Tier
+            </p>
+            <h3
+              className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[24px] leading-[1.15]"
+              style={{ color: "#F3F5FF" }}
+            >
+              Founding Members Club
+            </h3>
+          </div>
+
           {/* Card 2 — Founding Member */}
           <div
             ref={fmCardRef}
@@ -247,7 +264,7 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               className="font-[Inter,system-ui,sans-serif] font-medium text-[12px] uppercase tracking-[0.18em] mb-3"
               style={{ color: "var(--ether-gold)" }}
             >
-              Founding Member · Limited to 100
+              Limited to 100
             </p>
             <h3
               className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[24px] mb-3"
