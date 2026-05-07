@@ -188,7 +188,11 @@ export function Build() {
       const r = tl.getBoundingClientRect();
       const vh = window.innerHeight;
       if (r.height <= 0) return;
-      const p = (vh / 2 - r.top) / r.height;
+      // Trigger when a dot is at the viewport BOTTOM — i.e. it's just
+      // entered the viewport. With this mapping, dot at fraction d in the
+      // timeline lights at progress = d, so each phase fires "as soon as it
+      // enters the viewport" rather than only when it reaches the center.
+      const p = (vh - r.top) / r.height;
       setProgress(Math.max(0, Math.min(1, p)));
     }
     function onScroll() {
@@ -213,32 +217,38 @@ export function Build() {
   });
   const lit = monotonicLitRef.current;
 
-  // Track spans dot 1 → dot 3.
-  const trackTopPct = dotPositions[0] * 100;
-  const trackHeightPct = (dotPositions[2] - dotPositions[0]) * 100;
-  const trackProgressRange = dotPositions[2] - dotPositions[0];
-  // Bright fill grows from the top of the track to a clip-path bottom that
-  // tracks the user's scroll position within the track.
-  const fillProgress =
-    trackProgressRange > 0
-      ? Math.max(0, Math.min(1, (progress - dotPositions[0]) / trackProgressRange))
-      : 0;
+  // Each segment leads down to its phase's dot and carries that dot's color
+  // when the phase is lit. Segment 1 (top of timeline → dot 1) → cyan.
+  // Segment 2 (dot 1 → dot 2) → violet. Segment 3 (dot 2 → dot 3) → gold.
+  const SEGMENT_COLORS = ["#3DD9FF", "#8A7CFF", "#FFD27A"] as const;
+  const segmentRanges: Array<{ top: number; height: number; color: string; lit: boolean }> = [
+    {
+      top: 0,
+      height: dotPositions[0],
+      color: SEGMENT_COLORS[0],
+      lit: lit[0],
+    },
+    {
+      top: dotPositions[0],
+      height: dotPositions[1] - dotPositions[0],
+      color: SEGMENT_COLORS[1],
+      lit: lit[1],
+    },
+    {
+      top: dotPositions[1],
+      height: dotPositions[2] - dotPositions[1],
+      color: SEGMENT_COLORS[2],
+      lit: lit[2],
+    },
+  ];
 
-  // Dot 2's position within the track in percent — used as the cyan→violet
-  // hard-stop in the fill gradient so each segment carries its phase's color.
-  const dot2InTrackPct =
-    trackProgressRange > 0
-      ? ((dotPositions[1] - dotPositions[0]) / trackProgressRange) * 100
-      : 50;
-
-  // Glow color follows scroll position through the segments. Past dot 3 the
-  // glow takes on phase 3's gold even though the fill itself ends at dot 3.
+  // Glow color matches whichever segment the leading edge currently sits in.
   const glowColor =
-    progress < dotPositions[1]
-      ? "#3DD9FF"
-      : progress < dotPositions[2]
-        ? "#8A7CFF"
-        : "#FFD27A";
+    progress < dotPositions[0]
+      ? SEGMENT_COLORS[0]
+      : progress < dotPositions[1]
+        ? SEGMENT_COLORS[1]
+        : SEGMENT_COLORS[2];
 
   return (
     <section
@@ -269,50 +279,23 @@ export function Build() {
         </div>
 
         <div ref={timelineRef} className="relative">
-          {/* Dim track from dot 1 to dot 3 — drawn at all times. */}
-          <div
-            aria-hidden
-            className="absolute left-[7px] w-px"
-            style={{
-              top: `${trackTopPct}%`,
-              height: `${trackHeightPct}%`,
-              background: "rgb(148,163,184)",
-              opacity: 0.15,
-            }}
-          />
-
-          {/* Bright fill — same span, color-stopped (cyan above dot 2,
-              violet below), clipped from below by scroll progress. The fill
-              moves continuously with scroll, not in discrete steps. */}
-          <div
-            aria-hidden
-            className="absolute left-[7px] w-px"
-            style={{
-              top: `${trackTopPct}%`,
-              height: `${trackHeightPct}%`,
-              background: `linear-gradient(to bottom, #3DD9FF 0%, #3DD9FF ${dot2InTrackPct}%, #8A7CFF ${dot2InTrackPct}%, #8A7CFF 100%)`,
-              opacity: 0.85,
-              clipPath: `inset(0 0 ${(1 - fillProgress) * 100}% 0)`,
-            }}
-          />
-
-          {/* Phase 3 gold overlay — when phase 3 lights up, the dot 2 → dot 3
-              segment of the fill transitions from violet to gold to match the
-              dot's color. Layered on top of the cyan/violet fill at the same
-              0.85 opacity, with the same 600ms ease-out fade as the dots. By
-              the time phase 3 lights, scroll progress has already pushed the
-              fill all the way to dot 3, so this overlay sits exactly over the
-              violet section it replaces. */}
-          <div
-            aria-hidden
-            className="absolute left-[7px] w-px transition-opacity duration-[600ms] ease-out"
-            style={{
-              top: `${dotPositions[1] * 100}%`,
-              height: `${(dotPositions[2] - dotPositions[1]) * 100}%`,
-              background: "#FFD27A",
-              opacity: lit[2] ? 0.85 : 0,
-            }}
-          />
+          {/* Three discrete colored segments. Each segment starts dim slate
+              gray at 15% opacity and transitions (background + opacity) to
+              its phase's color at 85% opacity over 600ms when that phase
+              lights up. Once lit, stays lit (monotonic ref). */}
+          {segmentRanges.map((seg, i) => (
+            <div
+              key={`seg-${i}`}
+              aria-hidden
+              className="absolute left-[7px] w-px transition-all duration-[600ms] ease-out"
+              style={{
+                top: `${seg.top * 100}%`,
+                height: `${seg.height * 100}%`,
+                background: seg.lit ? seg.color : "rgb(148,163,184)",
+                opacity: seg.lit ? 0.85 : 0.15,
+              }}
+            />
+          ))}
 
           {/* Leading-edge glow — soft circle that always sits at the live
               scroll position inside the timeline, even before the fill has
