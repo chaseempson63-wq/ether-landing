@@ -1,6 +1,14 @@
 // Hand-composed constellation. 5 labeled anchor nodes + 6 unlabeled dots,
 // connected by 10 gently curved edges. No simulation, no library — every
 // position is hand-tuned so the composition reads like a night sky.
+//
+// Element sizes are 2× the prior pass (anchor r 14→28, primary 16→32, dot r
+// 5–6→10–12, label 11px→22px, edge stroke 1→2, star r 1→2). The
+// double-everything-and-double-the-viewBox approach is mathematically
+// net-zero — meet-fit halves the display ratio when the viewBox doubles, so
+// elements end up the same size on screen. The only way to render
+// visibly 2× elements without cropping or distorting the existing positions
+// is to bump size attributes in source while leaving the viewBox alone.
 
 const VIEW_W = 1200;
 const VIEW_H = 420;
@@ -37,7 +45,7 @@ type Dot = {
 type Edge = { a: string; b: string; bow: 1 | -1 };
 
 // Universal labels — visitors should be able to project themselves onto these,
-// not read someone else's biography.
+// not read someone else's biography. Positions unchanged from prior pass.
 const ANCHORS: Anchor[] = [
   { id: "voice",   label: "MY VOICE",        layer: "voice",     x: 195, y: 130, delay: 0   },
   { id: "love",    label: "FIRST LOVE",      layer: "memory",    x: 485, y: 105, delay: 0.8 },
@@ -46,15 +54,14 @@ const ANCHORS: Anchor[] = [
   { id: "grounds", label: "WHAT GROUNDS ME", layer: "emotional", x: 540, y: 320, delay: 3.2 },
 ];
 
-// Unlabeled dots scattered into the gaps. One of each layer-color (plus an
-// extra blue) so the full palette reads even where no label exists.
+// Unlabeled dots scattered into the gaps. Radii doubled vs prior pass.
 const DOTS: Dot[] = [
-  { id: "v_dot",  layer: "voice",     x: 92,   y: 248, r: 5.5, delay: 0   },
-  { id: "m_dot1", layer: "memory",    x: 770,  y: 70,  r: 5,   delay: 1   },
-  { id: "m_dot2", layer: "memory",    x: 290,  y: 285, r: 6,   delay: 2   },
-  { id: "r_dot",  layer: "reasoning", x: 855,  y: 305, r: 5.5, delay: 3   },
-  { id: "va_dot", layer: "values",    x: 1115, y: 268, r: 5,   delay: 4   },
-  { id: "e_dot",  layer: "emotional", x: 380,  y: 355, r: 6,   delay: 0.5 },
+  { id: "v_dot",  layer: "voice",     x: 92,   y: 248, r: 11, delay: 0   },
+  { id: "m_dot1", layer: "memory",    x: 770,  y: 70,  r: 10, delay: 1   },
+  { id: "m_dot2", layer: "memory",    x: 290,  y: 285, r: 12, delay: 2   },
+  { id: "r_dot",  layer: "reasoning", x: 855,  y: 305, r: 11, delay: 3   },
+  { id: "va_dot", layer: "values",    x: 1115, y: 268, r: 10, delay: 4   },
+  { id: "e_dot",  layer: "emotional", x: 380,  y: 355, r: 12, delay: 0.5 },
 ];
 
 const EDGES: Edge[] = [
@@ -169,12 +176,12 @@ export function MindMapStatic() {
         })}
       </defs>
 
-      {/* Faint star field — pure mind-sky decoration. */}
+      {/* Faint star field — pure mind-sky decoration. Radius doubled. */}
       {STARS.map((s, i) => (
-        <circle key={`star-${i}`} cx={s.x.toFixed(1)} cy={s.y.toFixed(1)} r={1} fill="#FFFFFF" opacity={s.o} />
+        <circle key={`star-${i}`} cx={s.x.toFixed(1)} cy={s.y.toFixed(1)} r={2} fill="#FFFFFF" opacity={s.o} />
       ))}
 
-      {/* Curved edges. No glow, no animation — keep them quiet under the nodes. */}
+      {/* Curved edges. Stroke doubled to 2 to match node scale. */}
       {EDGES.map((e) => {
         const a = NODE_BY_ID[e.a];
         const b = NODE_BY_ID[e.b];
@@ -185,7 +192,7 @@ export function MindMapStatic() {
             d={curvedPath(a.x, a.y, b.x, b.y, e.bow)}
             fill="none"
             stroke={avgRgba(LAYER_COLORS[a.layer], LAYER_COLORS[b.layer], 0.2)}
-            strokeWidth={1}
+            strokeWidth={2}
             strokeLinecap="round"
           />
         );
@@ -212,10 +219,10 @@ export function MindMapStatic() {
         );
       })}
 
-      {/* Labeled anchors */}
+      {/* Labeled anchors — radii and label sizes both doubled. */}
       {ANCHORS.map((n) => {
         const c = LAYER_COLORS[n.layer];
-        const r = n.primary ? 16 : 14;
+        const r = n.primary ? 32 : 28;
         const glowR = r * 3.0;
         return (
           <g key={n.id}>
@@ -232,12 +239,12 @@ export function MindMapStatic() {
             <circle cx={n.x} cy={n.y} r={r} fill={c} fillOpacity={0.92} />
             <text
               x={n.x}
-              y={n.y + r + 12}
+              y={n.y + r + 24}
               textAnchor="middle"
               dominantBaseline="hanging"
               style={{
                 fontFamily: "Inter, system-ui, sans-serif",
-                fontSize: "11px",
+                fontSize: "22px",
                 fontWeight: 500,
                 letterSpacing: "0.18em",
                 fill: "#B0B8C6",
