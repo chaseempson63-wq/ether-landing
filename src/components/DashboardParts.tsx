@@ -1,0 +1,446 @@
+import {
+  Sun,
+  Sparkles,
+  Headphones,
+  Network,
+  Shield,
+  Orbit,
+  Moon,
+  Mic,
+  Lock,
+  type LucideIcon,
+} from "lucide-react";
+
+// ─── Palette helpers ─────────────────────────────────────────────────────────
+
+export const ETHER_COLOR: Record<string, string> = {
+  gold: "var(--ether-gold)",
+  cyan: "var(--ether-cyan)",
+  violet: "var(--ether-violet)",
+  magenta: "var(--ether-magenta)",
+};
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  sun: Sun,
+  sparkles: Sparkles,
+  headphones: Headphones,
+  network: Network,
+  shield: Shield,
+  orbit: Orbit,
+  moon: Moon,
+  mic: Mic,
+};
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
+
+export function HeroBlock({
+  eyebrow,
+  headline,
+  body,
+}: {
+  eyebrow: string;
+  headline: string;
+  body: string;
+}) {
+  return (
+    <div className="mb-10">
+      <div className="text-[11px] tracking-[0.22em] text-slate-500 uppercase mb-3">
+        {eyebrow}
+      </div>
+      <h1 className="text-4xl md:text-5xl font-semibold text-white leading-tight mb-4 font-[Space_Grotesk,system-ui,sans-serif]">
+        {headline}
+      </h1>
+      <p className="text-slate-300 text-base md:text-lg max-w-2xl leading-relaxed">
+        {body}
+      </p>
+    </div>
+  );
+}
+
+// ─── Sparkline ───────────────────────────────────────────────────────────────
+
+export function Sparkline({
+  values,
+  color,
+  height = 28,
+  width = 80,
+}: {
+  values: number[];
+  color: string;
+  height?: number;
+  width?: number;
+}) {
+  if (values.length === 0) {
+    return <div style={{ width, height }} />;
+  }
+  const max = Math.max(...values, 1);
+  const step = values.length > 1 ? width / (values.length - 1) : 0;
+  const points = values
+    .map((v, i) => `${(i * step).toFixed(1)},${(height - (v / max) * height).toFixed(1)}`)
+    .join(" ");
+  return (
+    <svg width={width} height={height} className="block">
+      <polyline
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={points}
+      />
+    </svg>
+  );
+}
+
+// ─── Stat card ───────────────────────────────────────────────────────────────
+
+export function StatCard({
+  label,
+  count,
+  deltaWeek,
+  spark,
+  color,
+  icon: Icon,
+}: {
+  label: string;
+  count: number;
+  deltaWeek: number;
+  spark: number[];
+  color: string;
+  icon: LucideIcon;
+}) {
+  const deltaLabel =
+    deltaWeek > 0 ? `+${deltaWeek} this week` : deltaWeek < 0 ? `${deltaWeek} this week` : "steady this week";
+  return (
+    <div
+      className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-6 overflow-hidden"
+      style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.03)` }}
+    >
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        style={{
+          background: `radial-gradient(600px circle at 0% 0%, ${color}, transparent 60%)`,
+        }}
+      />
+      <div className="relative flex items-start justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4" style={{ color }} />
+          <div className="text-[11px] tracking-[0.18em] text-slate-400 uppercase">
+            {label}
+          </div>
+        </div>
+        <Sparkline values={spark} color={color} />
+      </div>
+      <div className="relative flex items-end justify-between">
+        <div className="text-4xl font-semibold text-white tabular-nums">{count}</div>
+        <div className="text-[11px] text-slate-500">{deltaLabel}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Streak card ─────────────────────────────────────────────────────────────
+
+export function StreakCard({
+  days,
+  week,
+}: {
+  days: number;
+  week: { label: string; active: boolean; today?: boolean }[];
+}) {
+  return (
+    <div className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-6 overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        style={{
+          background: `radial-gradient(600px circle at 100% 0%, var(--ether-gold), transparent 60%)`,
+        }}
+      />
+      <div className="relative flex items-start justify-between mb-4">
+        <div className="text-[11px] tracking-[0.18em] text-slate-400 uppercase">
+          Streak
+        </div>
+      </div>
+      <div className="relative flex items-end justify-between mb-3">
+        <div className="text-4xl font-semibold text-white tabular-nums">{days}</div>
+        <div className="text-[11px] text-slate-500">{days === 1 ? "day" : "days"} in a row</div>
+      </div>
+      <div className="relative flex gap-1.5">
+        {week.map((d, i) => (
+          <div
+            key={i}
+            className="flex-1 flex flex-col items-center gap-1"
+            title={d.label}
+          >
+            <div
+              className={`w-full aspect-square rounded-full transition-colors ${d.today ? "ring-2 ring-[var(--ether-gold)]/60 ring-offset-0" : ""}`}
+              style={{
+                background: d.active
+                  ? "var(--ether-gold)"
+                  : "rgba(255,255,255,0.05)",
+              }}
+            />
+            <div className="text-[11px] text-slate-500">{d.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Brain rings viz ─────────────────────────────────────────────────────────
+
+export function BrainRingsViz({
+  nodes,
+  connections,
+  coherence,
+  memoriesCount,
+  insightsCount,
+  valuesCount,
+}: {
+  nodes: number;
+  connections: number;
+  coherence: number;
+  memoriesCount: number;
+  insightsCount: number;
+  valuesCount: number;
+}) {
+  const RING_CAP = 14;
+  const rings = [
+    {
+      count: Math.min(memoriesCount, RING_CAP),
+      radius: 110,
+      color: "#3DD9FF",
+      size: 3.2,
+      overflow: memoriesCount > RING_CAP,
+    },
+    {
+      count: Math.min(insightsCount, RING_CAP),
+      radius: 160,
+      color: "#8A7CFF",
+      size: 2.6,
+      overflow: insightsCount > RING_CAP,
+    },
+    {
+      count: Math.min(valuesCount, RING_CAP),
+      radius: 210,
+      color: "#FF6FD1",
+      size: 2.2,
+      overflow: valuesCount > RING_CAP,
+    },
+  ];
+  const max = Math.max(...rings.map((r) => r.radius)) + 20;
+  const size = max * 2;
+  return (
+    <div className="w-full max-w-[440px] mx-auto">
+    <div className="relative w-full aspect-square">
+      <svg
+        viewBox={`${-max} ${-max} ${size} ${size}`}
+        width="100%"
+        height="100%"
+        className="overflow-visible"
+      >
+        {rings.map((ring, i) => (
+          <circle
+            key={`g${i}`}
+            cx="0"
+            cy="0"
+            r={ring.radius}
+            fill="none"
+            stroke={ring.color}
+            strokeOpacity="0.08"
+            strokeWidth="1"
+          />
+        ))}
+        {rings.map((ring, ri) => {
+          const baseOpacity = ring.overflow ? 0.95 : 0.85;
+          return (
+            <g
+              key={`r${ri}`}
+              style={{
+                transformOrigin: "0 0",
+                animation: `etherSpin ${60 + ri * 25}s linear ${ri % 2 === 0 ? "" : "reverse"} infinite`,
+              }}
+            >
+              {Array.from({ length: ring.count }).map((_, i) => {
+                const angle = (i / Math.max(ring.count, 1)) * Math.PI * 2;
+                const x = Math.cos(angle) * ring.radius;
+                const y = Math.sin(angle) * ring.radius;
+                return (
+                  <circle
+                    key={i}
+                    cx={x}
+                    cy={y}
+                    r={ring.size}
+                    fill={ring.color}
+                    opacity={baseOpacity}
+                    style={{
+                      filter: `drop-shadow(0 0 6px ${ring.color})`,
+                    }}
+                  />
+                );
+              })}
+            </g>
+          );
+        })}
+        <defs>
+          <radialGradient id="etherCore" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#C9BFFF" stopOpacity="1" />
+            <stop offset="60%" stopColor="#6B5DFF" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#6B5DFF" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle
+          cx="0"
+          cy="0"
+          r="20"
+          fill="url(#etherCore)"
+          style={{
+            transformOrigin: "0 0",
+            animation: "etherBreathe 4s ease-in-out infinite alternate",
+          }}
+        />
+      </svg>
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+        <div className="text-[11px] tracking-widest text-slate-400 uppercase mb-1">
+          Coherence
+        </div>
+        <div className="text-5xl font-[Space_Grotesk,system-ui,sans-serif] font-semibold tracking-tight text-white tabular-nums leading-none">
+          {(coherence * 100).toFixed(0)}
+          <span className="text-lg align-top ml-0.5 text-slate-400 font-normal">%</span>
+        </div>
+      </div>
+
+      <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-xs text-slate-500 tracking-wide whitespace-nowrap tabular-nums">
+        {nodes} nodes · {connections} connections
+      </div>
+    </div>
+
+    <div className="mt-12 flex items-center justify-center gap-4 text-[11px] text-slate-400 tracking-wide">
+      <LegendDot color="#3DD9FF" label="Memories" />
+      <span className="text-slate-600">·</span>
+      <LegendDot color="#8A7CFF" label="Insights" />
+      <span className="text-slate-600">·</span>
+      <LegendDot color="#FF6FD1" label="Values" />
+    </div>
+  </div>
+  );
+}
+
+function LegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        className="w-1.5 h-1.5 rounded-full inline-block"
+        style={{ background: color, boxShadow: `0 0 6px ${color}` }}
+      />
+      {label}
+    </span>
+  );
+}
+
+// ─── Memory stream row ───────────────────────────────────────────────────────
+
+const TYPE_COLOR: Record<string, string> = {
+  voice: "var(--ether-cyan)",
+  interview: "var(--ether-violet)",
+  reflection: "var(--ether-magenta)",
+  insight: "var(--ether-gold)",
+};
+
+const RARITY_SHADOW: Record<string, string> = {
+  common: "",
+  rare: "shadow-[0_0_0_1px_rgba(138,124,255,0.2)]",
+  epic: "shadow-[0_0_0_1px_rgba(255,210,122,0.35),0_0_24px_rgba(255,210,122,0.1)]",
+};
+
+export function MemoryStreamRow({
+  type,
+  text,
+  tag,
+  meta,
+  rarity,
+}: {
+  type: "voice" | "interview" | "reflection" | "insight";
+  text: string;
+  tag: string;
+  meta: string;
+  rarity: "common" | "rare" | "epic";
+}) {
+  const color = TYPE_COLOR[type] ?? "var(--ether-ink0)";
+  return (
+    <div
+      className={`relative rounded-xl bg-white/[0.02] border border-white/5 p-4 ${RARITY_SHADOW[rarity]}`}
+      style={{ borderLeft: `3px solid ${color}` }}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span
+          className="text-[11px] tracking-[0.18em] font-medium uppercase px-2 py-0.5 rounded"
+          style={{
+            color,
+            background: `color-mix(in srgb, ${color} 12%, transparent)`,
+          }}
+        >
+          {tag}
+        </span>
+        <span className="text-[11px] text-slate-500">{meta}</span>
+      </div>
+      <p className="text-sm text-slate-200 leading-relaxed line-clamp-3">
+        {text}
+      </p>
+    </div>
+  );
+}
+
+// ─── Achievement medal ───────────────────────────────────────────────────────
+
+export function AchievementMedal({
+  name,
+  sub,
+  color,
+  icon,
+  isNew,
+  locked,
+}: {
+  name: string;
+  sub: string;
+  color: string;
+  icon: string;
+  isNew: boolean;
+  locked: boolean;
+}) {
+  const Icon = locked ? Lock : (ICON_MAP[icon] ?? Sparkles);
+  const hex = ETHER_COLOR[color] ?? "var(--ether-gold)";
+  return (
+    <div className="relative flex flex-col items-center text-center group">
+      {isNew && (
+        <span className="absolute -top-1 -right-1 z-10 text-[9px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[var(--ether-gold)] text-slate-950">
+          New
+        </span>
+      )}
+      <div
+        className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-transform ${locked ? "opacity-30 grayscale" : "group-hover:scale-105"}`}
+        style={{
+          background: locked
+            ? "rgba(255,255,255,0.04)"
+            : `radial-gradient(circle at 30% 30%, color-mix(in srgb, ${hex} 40%, transparent), color-mix(in srgb, ${hex} 5%, transparent))`,
+          boxShadow: locked
+            ? "inset 0 0 0 1px rgba(255,255,255,0.05)"
+            : `0 0 20px color-mix(in srgb, ${hex} 25%, transparent), inset 0 0 0 1px color-mix(in srgb, ${hex} 30%, transparent)`,
+        }}
+      >
+        <Icon
+          className="h-6 w-6"
+          style={{ color: locked ? "rgba(255,255,255,0.3)" : hex }}
+        />
+      </div>
+      <div className="mt-3 text-xs font-medium text-white leading-tight">
+        {name}
+      </div>
+      <div className="text-[11px] text-slate-500 mt-0.5">{sub}</div>
+    </div>
+  );
+}
