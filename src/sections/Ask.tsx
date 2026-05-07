@@ -1,8 +1,91 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  ShieldCheck,
+  Zap,
+  MessageCircle,
+  Wrench,
+  PiggyBank,
+  Stars,
+  type LucideIcon,
+} from "lucide-react";
 import { EtherButton } from "@/components/ether";
 import { supabase } from "../lib/supabase";
 
 const STRIPE_URL = "https://buy.stripe.com/28E28k1mAdFf5zy7VV0co00";
+
+type FMBenefit = {
+  icon: LucideIcon;
+  color: string;
+  heading: string;
+  description: string;
+};
+
+const FM_BENEFITS: FMBenefit[] = [
+  {
+    icon: ShieldCheck,
+    color: "#FFD27A",
+    heading: "Lifetime Founding Member status.",
+    description: "Once-ever badge. After 100, it's closed forever.",
+  },
+  {
+    icon: Zap,
+    color: "#8A7CFF",
+    heading: "Front of the line, day one.",
+    description: "While the waitlist waits, you're in the app the moment you check out.",
+  },
+  {
+    icon: MessageCircle,
+    color: "#3DD9FF",
+    heading: "A direct line to the founder.",
+    description: "Private channel. Not a Discord with 12,000 strangers — a small room with the team.",
+  },
+  {
+    icon: Wrench,
+    color: "#FF6FD1",
+    heading: "Real input on what gets built.",
+    description: "See roadmap drafts before anyone. Your feedback ships.",
+  },
+  {
+    icon: PiggyBank,
+    color: "#FFD27A",
+    heading: "Your $29 credits against your first paid year.",
+    description: "When subscriptions launch, the gesture comes off the top. Real risk: zero.",
+  },
+  {
+    icon: Stars,
+    color: "#8A7CFF",
+    heading: "Your name in the founding ledger.",
+    description: "The first 100 are permanent. Your kids will point at it.",
+  },
+];
+
+function FMBenefitRow({ benefit }: { benefit: FMBenefit }) {
+  const Icon = benefit.icon;
+  return (
+    <li className="flex items-start gap-3.5">
+      <Icon
+        className="flex-shrink-0 mt-[2px]"
+        size={18}
+        style={{ color: benefit.color }}
+        aria-hidden
+      />
+      <div className="min-w-0">
+        <span
+          className="font-[Inter,system-ui,sans-serif] font-semibold text-[14px] leading-[1.4]"
+          style={{ color: "#F3F5FF" }}
+        >
+          {benefit.heading}
+        </span>{" "}
+        <span
+          className="font-[Source_Serif_4,Georgia,serif] text-[14px] leading-[1.5]"
+          style={{ color: "#B0B8C6" }}
+        >
+          {benefit.description}
+        </span>
+      </div>
+    </li>
+  );
+}
 
 type Props = {
   /** When the parent navigates here with ?ref=fm we should auto-open the modal. */
@@ -173,17 +256,16 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               Help build it. Forever on the wall.
             </h3>
             <p
-              className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[15px] mb-3"
+              className="font-[Source_Serif_4,Georgia,serif] leading-[1.5] text-[16px] mb-5"
               style={{ color: "#B0B8C6" }}
             >
-              Founding Members aren't buying a product. They're putting their name on a project worth helping build. $29, one time. Lifetime Founding Member status. First to the product. A direct line to the team. And real input on what gets built next.
+              Not a customer. A co-builder. Here's what comes with it:
             </p>
-            <p
-              className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[14px] mb-5 flex-1"
-              style={{ color: "#8A93A6" }}
-            >
-              Limited to the first 100 who believe in this. After that, the door closes.
-            </p>
+            <ul className="space-y-3.5 mb-6 flex-1">
+              {FM_BENEFITS.map((b) => (
+                <FMBenefitRow key={b.heading} benefit={b} />
+              ))}
+            </ul>
             <p
               className="font-[Inter,system-ui,sans-serif] font-medium text-[11px] tracking-[0.18em] mb-4"
               style={{ color: "var(--ether-gold)" }}
