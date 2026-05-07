@@ -1,42 +1,55 @@
 import { BreathingCore, StatusPill } from "@/components/ether";
 import type { StatusPillTone, BreathingCoreTone } from "@/components/ether";
 
-type TimelineEntry = {
+type Phase = {
   status: string;
   pillTone: StatusPillTone;
   coreTone: BreathingCoreTone | "neutral";
+  bulletColor: string;
   title: string;
   body: string;
+  bullets: string[];
 };
 
-const ENTRIES: TimelineEntry[] = [
+const PHASES: Phase[] = [
   {
-    status: "Shipped — April 2026",
+    status: "Phase one · Now",
     pillTone: "memory",
     coreTone: "cyan",
-    title: "Halliday Interview Engine",
-    body: "The four-phase conversational state machine that asks the questions only you can answer.",
+    bulletColor: "#3DD9FF",
+    title: "Build Your Mind",
+    body: "Sign up, start talking, and watch your digital mind take shape. Ether learns how you think through natural conversations that get deeper over time. Save memories, see your mind map grow, and build something that lasts.",
+    bullets: [
+      "Natural conversations that capture how you think",
+      "Quick memory capture — save moments anytime",
+      "Your mind map — a living picture of your intelligence",
+    ],
   },
   {
-    status: "Shipped — May 2026",
+    status: "Phase two · Next",
     pillTone: "insight",
     coreTone: "violet",
-    title: "Mind Map + Persona Chat",
-    body: "Watch your thinking take shape. Talk to the version of you Ether has learned so far.",
+    bulletColor: "#8A7CFF",
+    title: "Bring It Alive",
+    body: "Your Ether stops being data and starts being you. See yourself, hear yourself — a digital version that looks and sounds like the real thing.",
+    bullets: [
+      "AI avatar — a visual version of your Ether",
+      "Voice cloning — your Ether speaks in your voice",
+      "Real-time conversation with your digital mind",
+    ],
   },
   {
-    status: "Shipping now",
-    pillTone: "value",
-    coreTone: "magenta",
-    title: "Voice cloning (ElevenLabs)",
-    body: "So when they ask, they hear you — not a transcript.",
-  },
-  {
-    status: "On the roadmap",
+    status: "Phase three · Future",
     pillTone: "neutral",
     coreTone: "neutral",
-    title: "Beneficiary Access",
-    body: "The legacy layer. The people you choose, talking with your mind, long after.",
+    bulletColor: "rgba(148,163,184,0.6)",
+    title: "Leave It Behind",
+    body: "The people you love get access to everything you've built. Your intelligence stays in the family — and if you choose, the world.",
+    bullets: [
+      "Beneficiary access — your family can talk to your Ether",
+      "Legacy controls — you decide who gets access and when",
+      "Marketplace — share your mind publicly and earn from it",
+    ],
   },
 ];
 
@@ -45,11 +58,52 @@ function TimelineDot({ tone }: { tone: BreathingCoreTone | "neutral" }) {
     return (
       <span
         className="block w-4 h-4 rounded-full"
-        style={{ background: "rgba(148,163,184,0.25)" }}
+        style={{ background: "rgba(148,163,184,0.25)", opacity: 0.5 }}
       />
     );
   }
   return <BreathingCore tone={tone} size={16} />;
+}
+
+function PhaseEntry({ phase }: { phase: Phase }) {
+  return (
+    <li className="relative pl-8 sm:pl-10">
+      <div className="absolute left-0 top-0 flex items-center justify-center w-4 h-4">
+        <TimelineDot tone={phase.coreTone} />
+      </div>
+      <div className="mb-3">
+        <StatusPill tone={phase.pillTone}>{phase.status}</StatusPill>
+      </div>
+      <h3
+        className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[19px] sm:text-[20px] mb-2"
+        style={{ color: "#F3F5FF" }}
+      >
+        {phase.title}
+      </h3>
+      <p
+        className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[15px] sm:text-[16px] mb-3"
+        style={{ color: "#B0B8C6" }}
+      >
+        {phase.body}
+      </p>
+      <ul className="space-y-1.5 mt-3">
+        {phase.bullets.map((b) => (
+          <li
+            key={b}
+            className="flex items-start gap-2.5 font-[Inter,system-ui,sans-serif] text-[14px] leading-[1.6]"
+            style={{ color: "#8A93A6" }}
+          >
+            <span
+              aria-hidden
+              className="inline-block flex-shrink-0 mt-[7px] w-[6px] h-[6px]"
+              style={{ background: phase.bulletColor }}
+            />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+    </li>
+  );
 }
 
 export function Build() {
@@ -81,7 +135,6 @@ export function Build() {
         </div>
 
         <div className="relative">
-          {/* Vertical connector line */}
           <div
             aria-hidden
             className="absolute left-[7px] sm:left-[7px] top-2 bottom-2 w-px"
@@ -90,28 +143,9 @@ export function Build() {
                 "linear-gradient(180deg, rgba(138,124,255,0.18), rgba(255,255,255,0.05))",
             }}
           />
-          <ol className="space-y-8 sm:space-y-10">
-            {ENTRIES.map((e) => (
-              <li key={e.title} className="relative pl-8 sm:pl-10">
-                <div className="absolute left-0 top-0 flex items-center justify-center w-4 h-4">
-                  <TimelineDot tone={e.coreTone} />
-                </div>
-                <div className="mb-2">
-                  <StatusPill tone={e.pillTone}>{e.status}</StatusPill>
-                </div>
-                <h3
-                  className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[19px] sm:text-[20px] mb-1.5"
-                  style={{ color: "#F3F5FF" }}
-                >
-                  {e.title}
-                </h3>
-                <p
-                  className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[15px] sm:text-[16px]"
-                  style={{ color: "#B0B8C6" }}
-                >
-                  {e.body}
-                </p>
-              </li>
+          <ol className="space-y-12 sm:space-y-14">
+            {PHASES.map((p) => (
+              <PhaseEntry key={p.title} phase={p} />
             ))}
           </ol>
         </div>
