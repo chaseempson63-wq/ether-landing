@@ -59,17 +59,13 @@ const PHASES: Phase[] = [
 ];
 
 // Cross-fade between a flat 25%-opacity dim circle and the breathing core.
-// Both layers are always rendered; only the layer opacities transition.
 function TimelineDot({ phase, isLit }: { phase: Phase; isLit: boolean }) {
   return (
     <span className="relative block w-4 h-4">
       <span
         aria-hidden
         className="absolute inset-0 rounded-full transition-opacity duration-[600ms] ease-out"
-        style={{
-          background: phase.litColor,
-          opacity: isLit ? 0 : 0.25,
-        }}
+        style={{ background: phase.litColor, opacity: isLit ? 0 : 0.25 }}
       />
       <span
         aria-hidden
@@ -85,43 +81,19 @@ function TimelineDot({ phase, isLit }: { phase: Phase; isLit: boolean }) {
 type PhaseEntryProps = {
   phase: Phase;
   isLit: boolean;
-  isLast: boolean;
-  // Color of the line segment that runs from THIS phase's dot down to the
-  // next phase's dot. Lights when the next phase enters the viewport.
-  nextLitColor: string | null;
-  nextIsLit: boolean;
   phaseRef: React.RefObject<HTMLLIElement | null>;
+  dotRef: React.RefObject<HTMLDivElement | null>;
 };
 
-function PhaseEntry({
-  phase,
-  isLit,
-  isLast,
-  nextLitColor,
-  nextIsLit,
-  phaseRef,
-}: PhaseEntryProps) {
+function PhaseEntry({ phase, isLit, phaseRef, dotRef }: PhaseEntryProps) {
   return (
     <li ref={phaseRef} className="relative pl-8 sm:pl-10">
-      <div className="absolute left-0 top-0 flex items-center justify-center w-4 h-4">
+      <div
+        ref={dotRef}
+        className="absolute left-0 top-0 flex items-center justify-center w-4 h-4"
+      >
         <TimelineDot phase={phase} isLit={isLit} />
       </div>
-
-      {/* Line segment from THIS dot to the NEXT dot. Lives inside this li but
-          extends past the bottom edge with a negative `bottom` so it covers the
-          gap that `ol > space-y-{12|14}` creates and lands at the next dot's
-          center (top:0 + 8px flex-center). */}
-      {!isLast && nextLitColor && (
-        <span
-          aria-hidden
-          className="absolute left-[7px] top-2 w-px -bottom-14 sm:-bottom-16 transition-all duration-[600ms] ease-out"
-          style={{
-            background: nextIsLit ? nextLitColor : "rgb(148,163,184)",
-            opacity: nextIsLit ? 0.6 : 0.15,
-          }}
-        />
-      )}
-
       <div className="mb-3">
         <StatusPill tone={phase.pillTone}>{phase.status}</StatusPill>
       </div>
@@ -158,44 +130,119 @@ function PhaseEntry({
 }
 
 export function Build() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
   const phase1Ref = useRef<HTMLLIElement | null>(null);
   const phase2Ref = useRef<HTMLLIElement | null>(null);
   const phase3Ref = useRef<HTMLLIElement | null>(null);
+  const dot1Ref = useRef<HTMLDivElement | null>(null);
+  const dot2Ref = useRef<HTMLDivElement | null>(null);
+  const dot3Ref = useRef<HTMLDivElement | null>(null);
   const phaseRefs = [phase1Ref, phase2Ref, phase3Ref];
-  const [lit, setLit] = useState<boolean[]>([false, false, false]);
+  const dotRefs = [dot1Ref, dot2Ref, dot3Ref];
 
-  // Per-phase IntersectionObserver. Threshold 0.5 — fires when the phase entry's
-  // center crosses the viewport center. State is monotonic: once a phase is lit,
-  // it stays lit (scrolling back up doesn't dim it).
+  // Scroll progress through the timeline area: 0 when the viewport center is
+  // at or above the timeline top, 1 when at or below the timeline bottom. With
+  // this mapping a dot's fractional position within the timeline is exactly
+  // the progress value at which it sits at the viewport center — so dots can
+  // be lit by simply comparing `progress >= dotPositions[i]`.
+  const [progress, setProgress] = useState(0);
+  // Each dot's vertical position as a fraction of the timeline div's height.
+  const [dotPositions, setDotPositions] = useState<number[]>([0.15, 0.5, 0.85]);
+  // Lit state is monotonic — once a dot has been reached, it stays lit even
+  // when the user scrolls back up.
+  const monotonicLitRef = useRef<boolean[]>([false, false, false]);
+
+  // Measure dot positions on layout and on resize.
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    phaseRefs.forEach((ref, idx) => {
-      const el = ref.current;
-      if (!el) return;
-      const ob = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-              setLit((prev) => {
-                if (prev[idx]) return prev;
-                const next = [...prev];
-                next[idx] = true;
-                return next;
-              });
-            }
-          }
-        },
-        { threshold: 0.5 },
-      );
-      ob.observe(el);
-      observers.push(ob);
-    });
-    return () => observers.forEach((o) => o.disconnect());
+    function compute() {
+      const tl = timelineRef.current;
+      if (!tl) return;
+      const tlRect = tl.getBoundingClientRect();
+      if (tlRect.height <= 0) return;
+      const positions = dotRefs.map((ref) => {
+        if (!ref.current) return 0;
+        const dr = ref.current.getBoundingClientRect();
+        return (dr.top + dr.height / 2 - tlRect.top) / tlRect.height;
+      });
+      setDotPositions(positions);
+    }
+    compute();
+    const ro = new ResizeObserver(compute);
+    if (timelineRef.current) ro.observe(timelineRef.current);
+    window.addEventListener("resize", compute);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", compute);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Vanilla scroll listener (framer-motion isn't in the project) coalesced
+  // through requestAnimationFrame so we update at most once per frame.
+  useEffect(() => {
+    let raf = 0;
+    function tick() {
+      const tl = timelineRef.current;
+      if (!tl) return;
+      const r = tl.getBoundingClientRect();
+      const vh = window.innerHeight;
+      if (r.height <= 0) return;
+      const p = (vh / 2 - r.top) / r.height;
+      setProgress(Math.max(0, Math.min(1, p)));
+    }
+    function onScroll() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  // Mutate the monotonic ref during render — refs don't trigger renders, so
+  // this is safe; we read it the same render and pass primitive booleans to
+  // children.
+  dotPositions.forEach((pos, i) => {
+    if (progress >= pos) monotonicLitRef.current[i] = true;
+  });
+  const lit = monotonicLitRef.current;
+
+  // Track spans dot 1 → dot 3.
+  const trackTopPct = dotPositions[0] * 100;
+  const trackHeightPct = (dotPositions[2] - dotPositions[0]) * 100;
+  const trackProgressRange = dotPositions[2] - dotPositions[0];
+  // Bright fill grows from the top of the track to a clip-path bottom that
+  // tracks the user's scroll position within the track.
+  const fillProgress =
+    trackProgressRange > 0
+      ? Math.max(0, Math.min(1, (progress - dotPositions[0]) / trackProgressRange))
+      : 0;
+
+  // Dot 2's position within the track in percent — used as the cyan→violet
+  // hard-stop in the fill gradient so each segment carries its phase's color.
+  const dot2InTrackPct =
+    trackProgressRange > 0
+      ? ((dotPositions[1] - dotPositions[0]) / trackProgressRange) * 100
+      : 50;
+
+  // Glow color follows scroll position through the segments. Past dot 3 the
+  // glow takes on phase 3's gold even though the fill itself ends at dot 3.
+  const glowColor =
+    progress < dotPositions[1]
+      ? "#3DD9FF"
+      : progress < dotPositions[2]
+        ? "#8A7CFF"
+        : "#FFD27A";
+
   return (
     <section
+      ref={sectionRef}
       id="section-build"
       className="relative min-h-screen flex items-center px-6 sm:px-8 py-20 sm:py-28"
     >
@@ -221,17 +268,61 @@ export function Build() {
           </p>
         </div>
 
-        <div className="relative">
+        <div ref={timelineRef} className="relative">
+          {/* Dim track from dot 1 to dot 3 — drawn at all times. */}
+          <div
+            aria-hidden
+            className="absolute left-[7px] w-px"
+            style={{
+              top: `${trackTopPct}%`,
+              height: `${trackHeightPct}%`,
+              background: "rgb(148,163,184)",
+              opacity: 0.15,
+            }}
+          />
+
+          {/* Bright fill — same span, color-stopped (cyan above dot 2,
+              violet below), clipped from below by scroll progress. The fill
+              moves continuously with scroll, not in discrete steps. */}
+          <div
+            aria-hidden
+            className="absolute left-[7px] w-px"
+            style={{
+              top: `${trackTopPct}%`,
+              height: `${trackHeightPct}%`,
+              background: `linear-gradient(to bottom, #3DD9FF 0%, #3DD9FF ${dot2InTrackPct}%, #8A7CFF ${dot2InTrackPct}%, #8A7CFF 100%)`,
+              opacity: 0.85,
+              clipPath: `inset(0 0 ${(1 - fillProgress) * 100}% 0)`,
+            }}
+          />
+
+          {/* Leading-edge glow — soft circle that always sits at the live
+              scroll position inside the timeline, even before the fill has
+              started. This is the part that makes the timeline feel alive. */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              left: "7px",
+              top: `${progress * 100}%`,
+              transform: "translate(-50%, -50%)",
+              width: "32px",
+              height: "32px",
+              borderRadius: "9999px",
+              background: `radial-gradient(circle, ${glowColor}99 0%, ${glowColor}44 40%, transparent 70%)`,
+              opacity: progress > 0.01 && progress < 0.99 ? 1 : 0,
+              transition: "background 250ms linear, opacity 250ms ease-out",
+            }}
+          />
+
           <ol className="space-y-12 sm:space-y-14">
             {PHASES.map((p, i) => (
               <PhaseEntry
                 key={p.title}
                 phase={p}
                 isLit={lit[i]}
-                isLast={i === PHASES.length - 1}
-                nextLitColor={i < PHASES.length - 1 ? PHASES[i + 1].litColor : null}
-                nextIsLit={i < PHASES.length - 1 ? lit[i + 1] : false}
                 phaseRef={phaseRefs[i]}
+                dotRef={dotRefs[i]}
               />
             ))}
           </ol>
