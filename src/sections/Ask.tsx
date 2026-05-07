@@ -74,7 +74,7 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
             className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] mx-auto max-w-[580px] text-[16px] sm:text-[18px]"
             style={{ color: "#B0B8C6" }}
           >
-            The first 1,000 people who believe in this don't just get early access. They fund the build itself — the careful, expensive work of making something worth holding the most important thing you've ever made.
+            The first 100 people who believe in this don't just get early access. They fund the build itself — the careful, expensive work of making something worth holding the most important thing you've ever made.
           </p>
         </div>
 
@@ -164,7 +164,7 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               className="font-[Inter,system-ui,sans-serif] font-medium text-[12px] uppercase tracking-[0.18em] mb-3"
               style={{ color: "var(--ether-gold)" }}
             >
-              Founding Member · Limited to 1,000
+              Founding Member · Limited to 100
             </p>
             <h3
               className="font-[Space_Grotesk,system-ui,sans-serif] font-semibold text-[24px] mb-3"
@@ -176,13 +176,13 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[15px] mb-3"
               style={{ color: "#B0B8C6" }}
             >
-              Founding Members fund the next 12 months of the build. In return: lifetime priority access, your name in the vault's founding ledger, and the kind of input that shapes what gets built next.
+              Founding Members aren't buying a product. They're putting their name on a project worth helping build. $29, one time. Lifetime Founding Member status. First to the product. A direct line to the team. And real input on what gets built next.
             </p>
             <p
               className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[14px] mb-6 flex-1"
               style={{ color: "#8A93A6" }}
             >
-              This is a once-ever thing. After 1,000, the door closes. Forever.
+              Limited to the first 100 who believe in this. After that, the door closes.
             </p>
             <EtherButton
               variant="earned"
@@ -198,7 +198,7 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
           className="font-[Inter,system-ui,sans-serif] text-[13px] text-center"
           style={{ color: "#5a6573" }}
         >
-          237 / 1,000 founding members have already joined.
+          37 / 100 founding members have already joined.
         </p>
       </div>
 
@@ -225,10 +225,38 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               You're stepping in. Here's what happens next.
             </h3>
             <p
-              className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[16px] mb-7"
+              className="font-[Source_Serif_4,Georgia,serif] leading-[1.65] text-[16px] mb-4"
               style={{ color: "#B0B8C6" }}
             >
-              Your <span style={{ color: "var(--ether-gold)", fontWeight: 600 }}>$197</span> funds the next 12 months of the build. Once-ever pricing. Once-ever access. The door closes at 1,000.
+              <span style={{ color: "var(--ether-gold)", fontWeight: 600 }}>$29 one-time.</span> That's the gesture. What you get back:
+            </p>
+            <ul className="space-y-2 mb-5">
+              {[
+                "Lifetime Founding Member status — once-ever, can't be bought later",
+                "Immediate access to Ether — start building your mind right after checkout",
+                "Direct line to the founder and team",
+                "Real input on what gets built next",
+                "Your $29 credited against your first year's subscription when paid plans launch",
+              ].map((line) => (
+                <li
+                  key={line}
+                  className="flex items-start gap-2.5 font-[Inter,system-ui,sans-serif] text-[14px] leading-[1.8]"
+                  style={{ color: "#F3F5FF" }}
+                >
+                  <span
+                    aria-hidden
+                    className="inline-block flex-shrink-0 mt-[9px] w-[6px] h-[6px]"
+                    style={{ background: "var(--ether-gold)" }}
+                  />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+            <p
+              className="font-[Source_Serif_4,Georgia,serif] italic text-[14px] mb-6"
+              style={{ color: "#8A93A6" }}
+            >
+              Limited to the first 100. Once they're in, it's closed.
             </p>
             <div className="flex flex-col gap-3">
               <EtherButton
