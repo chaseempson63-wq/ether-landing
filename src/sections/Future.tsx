@@ -95,9 +95,9 @@ export function Future() {
   return (
     <section
       id="section-future"
-      className="relative px-6 sm:px-8 py-20 sm:py-28"
+      className="relative py-20 sm:py-28"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto px-6 sm:px-8">
         {/* 3A — Layer chips */}
         <div className="text-center mb-16 sm:mb-20">
           <p
@@ -157,8 +157,13 @@ export function Future() {
           </p>
         </div>
 
+      </div>
+
+      {/* Mind Map — pulled wider than the rest of the section so the
+          constellation has room to breathe horizontally. */}
+      <div className="mx-auto w-full max-w-[1400px] px-3 sm:px-6">
         <div
-          className="relative w-full overflow-hidden rounded-2xl h-[360px] sm:h-[520px]"
+          className="relative w-full overflow-hidden rounded-2xl h-[320px] sm:h-[420px]"
           style={{
             background:
               "radial-gradient(60% 60% at 50% 50%, rgba(138,124,255,0.04) 0%, transparent 100%)",

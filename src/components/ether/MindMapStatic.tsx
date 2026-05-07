@@ -1,65 +1,79 @@
-// Hand-composed static SVG mind map. Replaces the prior react-force-graph-2d
-// + d3-force render — the live simulation jittered on lower-spec devices and
-// the 11-node graph never needed a force engine. Positions are tuned by hand
-// so the composition reads as five Halliday clusters with the cross-cluster
-// edges carrying the visual weight.
+// Hand-composed constellation. 5 labeled anchor nodes + 6 unlabeled dots,
+// connected by 10 gently curved edges. No simulation, no library — every
+// position is hand-tuned so the composition reads like a night sky.
 
-const VIEW_W = 800;
-const VIEW_H = 500;
+const VIEW_W = 1200;
+const VIEW_H = 420;
 
-const LAYER_COLORS: Record<string, string> = {
-  voice_and_language: "#8b5cf6",
-  memory_and_life_events: "#3b82f6",
-  reasoning_and_decisions: "#10b981",
-  values_and_beliefs: "#f59e0b",
-  emotional_patterns: "#ef4444",
-};
+const LAYER_COLORS = {
+  voice: "#8b5cf6",
+  memory: "#3b82f6",
+  reasoning: "#10b981",
+  values: "#f59e0b",
+  emotional: "#ef4444",
+} as const;
 
-type StaticNode = {
+type Layer = keyof typeof LAYER_COLORS;
+
+type Anchor = {
   id: string;
-  label?: string;
-  layer: keyof typeof LAYER_COLORS;
+  label: string;
+  layer: Layer;
   x: number;
   y: number;
-  anchor: boolean;
+  delay: number;
+  primary?: boolean;
 };
 
-// Only the 5 nodes the brief calls out get visible labels; the other six read
-// as colored dots. Labels do real semantic work for the visitor; everything
-// else is texture.
-const NODES: StaticNode[] = [
-  { id: "v1", layer: "voice_and_language", x: 200, y: 150, anchor: false },
-  { id: "v2", layer: "voice_and_language", x: 130, y: 220, anchor: false },
-  { id: "m1", label: "BROKE MY LEG AT 12", layer: "memory_and_life_events", x: 320, y: 100, anchor: true },
-  { id: "m2", layer: "memory_and_life_events", x: 450, y: 80, anchor: false },
-  { id: "m3", label: "MOVING ABROAD", layer: "memory_and_life_events", x: 570, y: 160, anchor: true },
-  { id: "r1", label: "HOW I DECIDE", layer: "reasoning_and_decisions", x: 400, y: 250, anchor: true },
-  { id: "r2", layer: "reasoning_and_decisions", x: 310, y: 330, anchor: false },
-  { id: "va1", label: "FAMILY FIRST", layer: "values_and_beliefs", x: 540, y: 320, anchor: true },
-  { id: "va2", layer: "values_and_beliefs", x: 650, y: 380, anchor: false },
-  { id: "e1", layer: "emotional_patterns", x: 250, y: 400, anchor: false },
-  { id: "e2", label: "WHAT GROUNDS ME", layer: "emotional_patterns", x: 450, y: 420, anchor: true },
+type Dot = {
+  id: string;
+  layer: Layer;
+  x: number;
+  y: number;
+  r: number;
+  delay: number;
+};
+
+type Edge = { a: string; b: string; bow: 1 | -1 };
+
+// Universal labels — visitors should be able to project themselves onto these,
+// not read someone else's biography.
+const ANCHORS: Anchor[] = [
+  { id: "voice",   label: "MY VOICE",        layer: "voice",     x: 195, y: 130, delay: 0   },
+  { id: "love",    label: "FIRST LOVE",      layer: "memory",    x: 485, y: 105, delay: 0.8 },
+  { id: "decide",  label: "HOW I DECIDE",    layer: "reasoning", x: 640, y: 215, delay: 1.6, primary: true },
+  { id: "family",  label: "FAMILY",          layer: "values",    x: 955, y: 135, delay: 2.4 },
+  { id: "grounds", label: "WHAT GROUNDS ME", layer: "emotional", x: 540, y: 320, delay: 3.2 },
 ];
 
-const NODE_BY_ID: Record<string, StaticNode> = Object.fromEntries(
-  NODES.map((n) => [n.id, n]),
-);
-
-type StaticLink = { source: string; target: string };
-const LINKS: StaticLink[] = [
-  { source: "v1", target: "v2" },
-  { source: "m1", target: "m2" },
-  { source: "m1", target: "m3" },
-  { source: "m2", target: "r2" },
-  { source: "r1", target: "r2" },
-  { source: "r1", target: "va1" },
-  { source: "va1", target: "va2" },
-  { source: "va1", target: "e2" },
-  { source: "e1", target: "e2" },
-  { source: "r1", target: "e1" },
-  { source: "v1", target: "r1" },
-  { source: "m3", target: "va2" },
+// Unlabeled dots scattered into the gaps. One of each layer-color (plus an
+// extra blue) so the full palette reads even where no label exists.
+const DOTS: Dot[] = [
+  { id: "v_dot",  layer: "voice",     x: 92,   y: 248, r: 5.5, delay: 0   },
+  { id: "m_dot1", layer: "memory",    x: 770,  y: 70,  r: 5,   delay: 1   },
+  { id: "m_dot2", layer: "memory",    x: 290,  y: 285, r: 6,   delay: 2   },
+  { id: "r_dot",  layer: "reasoning", x: 855,  y: 305, r: 5.5, delay: 3   },
+  { id: "va_dot", layer: "values",    x: 1115, y: 268, r: 5,   delay: 4   },
+  { id: "e_dot",  layer: "emotional", x: 380,  y: 355, r: 6,   delay: 0.5 },
 ];
+
+const EDGES: Edge[] = [
+  { a: "voice",   b: "v_dot",   bow:  1 },
+  { a: "voice",   b: "love",    bow: -1 },
+  { a: "love",    b: "m_dot1",  bow:  1 },
+  { a: "love",    b: "decide",  bow: -1 },
+  { a: "decide",  b: "m_dot2",  bow:  1 },
+  { a: "decide",  b: "grounds", bow: -1 },
+  { a: "decide",  b: "r_dot",   bow:  1 },
+  { a: "family",  b: "m_dot1",  bow: -1 },
+  { a: "family",  b: "va_dot",  bow:  1 },
+  { a: "grounds", b: "e_dot",   bow: -1 },
+];
+
+const NODE_BY_ID: Record<string, { x: number; y: number; layer: Layer }> = {
+  ...Object.fromEntries(ANCHORS.map((n) => [n.id, { x: n.x, y: n.y, layer: n.layer }])),
+  ...Object.fromEntries(DOTS.map((n) => [n.id, { x: n.x, y: n.y, layer: n.layer }])),
+};
 
 function hexToRgb(hex: string): [number, number, number] {
   return [
@@ -69,7 +83,7 @@ function hexToRgb(hex: string): [number, number, number] {
   ];
 }
 
-function mixHexAtAlpha(a: string, b: string, alpha: number): string {
+function avgRgba(a: string, b: string, alpha: number): string {
   const [ar, ag, ab] = hexToRgb(a);
   const [br, bg, bb] = hexToRgb(b);
   const r = Math.round((ar + br) / 2);
@@ -78,125 +92,167 @@ function mixHexAtAlpha(a: string, b: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${blue}, ${alpha})`;
 }
 
-// Deterministic per-node breathe delay (0–3.6s) so glows pulse out of phase
-// without depending on Math.random (which would re-seed every render).
-function delayFor(id: string): number {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return ((h % 36) / 10);
+// Quadratic bezier with control point offset perpendicular to the line by
+// ~10% of the line's length — gives a soft constellation arc.
+function curvedPath(x1: number, y1: number, x2: number, y2: number, bow: number): string {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const cx = mx - dy * 0.1 * bow;
+  const cy = my + dx * 0.1 * bow;
+  return `M ${x1} ${y1} Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${x2} ${y2}`;
 }
 
-function NodeGlow({ node }: { node: StaticNode }) {
-  const color = LAYER_COLORS[node.layer];
-  const radius = node.anchor ? 12 : 7;
-  const glowR = radius * 3.2;
-  const gradId = `glow-${node.id}`;
-  const delay = delayFor(node.id);
-  return (
-    <g>
-      <defs>
-        <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={color} stopOpacity={node.anchor ? 0.18 : 0.12} />
-          <stop offset="55%" stopColor={color} stopOpacity={node.anchor ? 0.07 : 0.04} />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <circle
-        cx={node.x}
-        cy={node.y}
-        r={glowR}
-        fill={`url(#${gradId})`}
-        style={{
-          transformBox: "fill-box",
-          transformOrigin: "center",
-          animation: "etherBreathe 4s ease-in-out infinite alternate",
-          animationDelay: `${delay}s`,
-        }}
-      />
-      <circle
-        cx={node.x}
-        cy={node.y}
-        r={radius}
-        fill={color}
-        fillOpacity={node.anchor ? 0.85 : 0.65}
-      />
-    </g>
-  );
+// Deterministic faint star field — pure decoration, no animation.
+function buildStars(count: number) {
+  const out: Array<{ x: number; y: number; o: number }> = [];
+  let seed = 7;
+  const rand = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+  for (let i = 0; i < count; i++) {
+    out.push({
+      x: rand() * VIEW_W,
+      y: rand() * VIEW_H,
+      o: 0.05 + rand() * 0.05,
+    });
+  }
+  return out;
 }
+const STARS = buildStars(36);
 
-function NodeLabel({ node }: { node: StaticNode }) {
-  if (!node.label) return null;
-  return (
-    <text
-      x={node.x}
-      y={node.y + (node.anchor ? 24 : 18)}
-      textAnchor="middle"
-      style={{
-        fontFamily: "Space Grotesk, system-ui, sans-serif",
-        fontSize: "11px",
-        fontWeight: 500,
-        fill: "#e2e8f0",
-        opacity: 0.9,
-      }}
-    >
-      {node.label}
-    </text>
-  );
-}
-
-type Props = {
-  /** Fallback when the parent doesn't size the container. */
-  height?: number;
-};
-
-export function MindMapStatic({ height }: Props = {}) {
+export function MindMapStatic() {
   return (
     <svg
       viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
       preserveAspectRatio="xMidYMid meet"
       width="100%"
-      height={height ?? "100%"}
+      height="100%"
       style={{ display: "block" }}
       aria-hidden="true"
     >
-      {/* Cross-cluster edges read first; same-cluster edges fade into the
-          background. The brief calls those cross-cluster lines the
-          "interesting" ones, so they get more weight. */}
-      {LINKS.map(({ source, target }) => {
-        const a = NODE_BY_ID[source];
-        const b = NODE_BY_ID[target];
+      <style>{`
+        @keyframes mmAnchorBreathe {
+          0%, 100% { opacity: 0.45; }
+          50%      { opacity: 0.72; }
+        }
+        @keyframes mmDotBreathe {
+          0%, 100% { opacity: 0.35; }
+          50%      { opacity: 0.58; }
+        }
+      `}</style>
+
+      <defs>
+        {ANCHORS.map((n) => {
+          const c = LAYER_COLORS[n.layer];
+          const inner = n.primary ? 0.7 : 0.6;
+          const mid = n.primary ? 0.22 : 0.18;
+          return (
+            <radialGradient key={`g-${n.id}`} id={`mm-glow-${n.id}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stopColor={c} stopOpacity={inner} />
+              <stop offset="55%"  stopColor={c} stopOpacity={mid} />
+              <stop offset="100%" stopColor={c} stopOpacity="0" />
+            </radialGradient>
+          );
+        })}
+        {DOTS.map((n) => {
+          const c = LAYER_COLORS[n.layer];
+          return (
+            <radialGradient key={`g-${n.id}`} id={`mm-glow-${n.id}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stopColor={c} stopOpacity="0.55" />
+              <stop offset="55%"  stopColor={c} stopOpacity="0.16" />
+              <stop offset="100%" stopColor={c} stopOpacity="0" />
+            </radialGradient>
+          );
+        })}
+      </defs>
+
+      {/* Faint star field — pure mind-sky decoration. */}
+      {STARS.map((s, i) => (
+        <circle key={`star-${i}`} cx={s.x.toFixed(1)} cy={s.y.toFixed(1)} r={1} fill="#FFFFFF" opacity={s.o} />
+      ))}
+
+      {/* Curved edges. No glow, no animation — keep them quiet under the nodes. */}
+      {EDGES.map((e) => {
+        const a = NODE_BY_ID[e.a];
+        const b = NODE_BY_ID[e.b];
         if (!a || !b) return null;
-        const sameLayer = a.layer === b.layer;
-        const stroke = sameLayer
-          ? mixHexAtAlpha(LAYER_COLORS[a.layer], LAYER_COLORS[b.layer], 0.18)
-          : mixHexAtAlpha(LAYER_COLORS[a.layer], LAYER_COLORS[b.layer], 0.3);
-        const width = sameLayer ? 1 : 1.2;
         return (
-          <line
-            key={`${source}-${target}`}
-            x1={a.x}
-            y1={a.y}
-            x2={b.x}
-            y2={b.y}
-            stroke={stroke}
-            strokeWidth={width}
+          <path
+            key={`${e.a}-${e.b}`}
+            d={curvedPath(a.x, a.y, b.x, b.y, e.bow)}
+            fill="none"
+            stroke={avgRgba(LAYER_COLORS[a.layer], LAYER_COLORS[b.layer], 0.2)}
+            strokeWidth={1}
             strokeLinecap="round"
           />
         );
       })}
 
-      {NODES.map((n) => (
-        <NodeGlow key={n.id} node={n} />
-      ))}
+      {/* Unlabeled dots */}
+      {DOTS.map((n) => {
+        const c = LAYER_COLORS[n.layer];
+        const glowR = n.r * 3.4;
+        return (
+          <g key={n.id}>
+            <circle
+              cx={n.x}
+              cy={n.y}
+              r={glowR}
+              fill={`url(#mm-glow-${n.id})`}
+              style={{
+                animation: "mmDotBreathe 5s ease-in-out infinite",
+                animationDelay: `${n.delay}s`,
+              }}
+            />
+            <circle cx={n.x} cy={n.y} r={n.r} fill={c} fillOpacity={0.85} />
+          </g>
+        );
+      })}
 
-      {NODES.map((n) => (
-        <NodeLabel key={n.id} node={n} />
-      ))}
+      {/* Labeled anchors */}
+      {ANCHORS.map((n) => {
+        const c = LAYER_COLORS[n.layer];
+        const r = n.primary ? 16 : 14;
+        const glowR = r * 3.0;
+        return (
+          <g key={n.id}>
+            <circle
+              cx={n.x}
+              cy={n.y}
+              r={glowR}
+              fill={`url(#mm-glow-${n.id})`}
+              style={{
+                animation: "mmAnchorBreathe 4s ease-in-out infinite",
+                animationDelay: `${n.delay}s`,
+              }}
+            />
+            <circle cx={n.x} cy={n.y} r={r} fill={c} fillOpacity={0.92} />
+            <text
+              x={n.x}
+              y={n.y + r + 12}
+              textAnchor="middle"
+              dominantBaseline="hanging"
+              style={{
+                fontFamily: "Inter, system-ui, sans-serif",
+                fontSize: "11px",
+                fontWeight: 500,
+                letterSpacing: "0.18em",
+                fill: "#B0B8C6",
+                textTransform: "uppercase",
+              }}
+            >
+              {n.label}
+            </text>
+          </g>
+        );
+      })}
     </svg>
   );
 }
 
-// Old typed exports retained as no-op aliases so external imports don't need
-// updating mid-pass — they're not used inside this file.
-export type MindMapStaticNode = StaticNode;
-export type MindMapStaticLink = StaticLink;
+// Kept as no-op type aliases so external imports compile without churn.
+export type MindMapStaticNode = Anchor;
+export type MindMapStaticLink = Edge;
