@@ -179,10 +179,16 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               Founding Members aren't buying a product. They're putting their name on a project worth helping build. $29, one time. Lifetime Founding Member status. First to the product. A direct line to the team. And real input on what gets built next.
             </p>
             <p
-              className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[14px] mb-6 flex-1"
+              className="font-[Source_Serif_4,Georgia,serif] leading-[1.6] text-[14px] mb-5 flex-1"
               style={{ color: "#8A93A6" }}
             >
               Limited to the first 100 who believe in this. After that, the door closes.
+            </p>
+            <p
+              className="font-[Inter,system-ui,sans-serif] font-medium text-[11px] tracking-[0.18em] mb-4"
+              style={{ color: "var(--ether-gold)" }}
+            >
+              $29 TODAY · DOUBLES AT 25 MEMBERS · CLOSES AT 100
             </p>
             <EtherButton
               variant="earned"
@@ -194,12 +200,20 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
           </div>
         </div>
 
-        <p
-          className="font-[Inter,system-ui,sans-serif] text-[13px] text-center"
-          style={{ color: "#5a6573" }}
-        >
-          37 / 100 founding members have already joined.
-        </p>
+        <div className="text-center space-y-1">
+          <p
+            className="font-[Inter,system-ui,sans-serif] font-medium text-[14px]"
+            style={{ color: "#F3F5FF" }}
+          >
+            17 / 100 founding members.
+          </p>
+          <p
+            className="font-[Inter,system-ui,sans-serif] text-[13px]"
+            style={{ color: "var(--ether-gold)" }}
+          >
+            Price doubles at 25 members.
+          </p>
+        </div>
       </div>
 
       {/* FM Confirmation Modal */}
@@ -256,7 +270,7 @@ export function Ask({ autoOpenFM, onAutoOpenHandled }: Props) {
               className="font-[Source_Serif_4,Georgia,serif] italic text-[14px] mb-6"
               style={{ color: "#8A93A6" }}
             >
-              Limited to the first 100. Once they're in, it's closed.
+              $29 today. Doubles at 25 members. Closes at 100.
             </p>
             <div className="flex flex-col gap-3">
               <EtherButton
