@@ -1,4 +1,3 @@
-import { useEffect, useState, useRef } from "react";
 import { MindMapStatic } from "@/components/ether";
 
 const LAYERS = [
@@ -37,35 +36,6 @@ const LAYERS = [
     hex: "#ef4444",
     blurb: "What moves you, breaks you, holds you together",
   },
-];
-
-const NODES = [
-  { id: "v1", label: "HOW I SAY IT", hallidayLayer: "voice_and_language", nodeType: "concept", edgeCount: 4, depth: 3 },
-  { id: "v2", label: "CHILDHOOD ACCENT", hallidayLayer: "voice_and_language", nodeType: "memory", edgeCount: 2, depth: 2 },
-  { id: "m1", label: "BROKE MY LEG AT 12", hallidayLayer: "memory_and_life_events", nodeType: "memory", edgeCount: 5, depth: 4 },
-  { id: "m2", label: "FIRST JOB", hallidayLayer: "memory_and_life_events", nodeType: "memory", edgeCount: 3, depth: 3 },
-  { id: "m3", label: "MOVING ABROAD", hallidayLayer: "memory_and_life_events", nodeType: "memory", edgeCount: 4, depth: 4 },
-  { id: "r1", label: "HOW I DECIDE", hallidayLayer: "reasoning_and_decisions", nodeType: "concept", edgeCount: 6, depth: 5 },
-  { id: "r2", label: "MISTAKES I OWN", hallidayLayer: "reasoning_and_decisions", nodeType: "concept", edgeCount: 3, depth: 3 },
-  { id: "va1", label: "FAMILY FIRST", hallidayLayer: "values_and_beliefs", nodeType: "concept", edgeCount: 5, depth: 4 },
-  { id: "va2", label: "KEEP MY WORD", hallidayLayer: "values_and_beliefs", nodeType: "concept", edgeCount: 4, depth: 4 },
-  { id: "e1", label: "WHAT BREAKS ME", hallidayLayer: "emotional_patterns", nodeType: "concept", edgeCount: 3, depth: 3 },
-  { id: "e2", label: "WHAT GROUNDS ME", hallidayLayer: "emotional_patterns", nodeType: "concept", edgeCount: 4, depth: 4 },
-];
-
-const LINKS = [
-  { source: "v1", target: "v2", strength: 0.6 },
-  { source: "m1", target: "m2", strength: 0.5 },
-  { source: "m1", target: "m3", strength: 0.7 },
-  { source: "m2", target: "r2", strength: 0.6 },
-  { source: "r1", target: "r2", strength: 0.8 },
-  { source: "r1", target: "va1", strength: 0.7 },
-  { source: "va1", target: "va2", strength: 0.6 },
-  { source: "va1", target: "e2", strength: 0.5 },
-  { source: "e1", target: "e2", strength: 0.7 },
-  { source: "r1", target: "e1", strength: 0.4 },
-  { source: "v1", target: "r1", strength: 0.5 },
-  { source: "m3", target: "va2", strength: 0.4 },
 ];
 
 function LayerChip({
@@ -122,23 +92,6 @@ function LayerChip({
 }
 
 export function Future() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: 640, height: 520, isMobile: false });
-
-  useEffect(() => {
-    const update = () => {
-      const el = containerRef.current;
-      if (!el) return;
-      const w = el.clientWidth;
-      const isMobile = window.innerWidth < 640;
-      const height = isMobile ? 360 : 520;
-      if (w > 0) setSize({ width: w, height, isMobile });
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
   return (
     <section
       id="section-future"
@@ -205,19 +158,13 @@ export function Future() {
         </div>
 
         <div
-          ref={containerRef}
-          className="relative w-full overflow-hidden rounded-2xl"
+          className="relative w-full overflow-hidden rounded-2xl h-[360px] sm:h-[520px]"
           style={{
             background:
               "radial-gradient(60% 60% at 50% 50%, rgba(138,124,255,0.04) 0%, transparent 100%)",
           }}
         >
-          <MindMapStatic
-            nodes={NODES}
-            links={LINKS}
-            width={size.width}
-            height={size.height}
-          />
+          <MindMapStatic />
         </div>
       </div>
     </section>
