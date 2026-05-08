@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Wound } from "./sections/Wound";
 import { Gone } from "./sections/Gone";
+import { DayWithEther } from "./sections/DayWithEther";
 import { Bridge } from "./sections/Bridge";
 import { Future } from "./sections/Future";
 import { Build } from "./sections/Build";
@@ -8,11 +9,12 @@ import { Ask } from "./sections/Ask";
 import { Footer } from "./sections/Footer";
 import { EtherAvatar } from "./companion/EtherAvatar";
 
-const SECTION_ORDER = ["wound", "gone", "bridge", "future", "build", "ask"];
+const SECTION_ORDER = ["wound", "gone", "day-with-ether", "bridge", "future", "build", "ask"];
 
 const SECTION_MESSAGES = {
   wound: "One day they'll ask what you were really like. Make sure they have an answer.",
   gone: "This is what disappears. Every time. Until something changes that.",
+  "day-with-ether": "Five seconds to capture. Forever to keep. That's the deal.",
   bridge: "This is your mind, visualized. The bigger the node, the deeper I know it.",
   future: "The more I know, the more I sound like you.",
   build: "You're early. Everything you add now becomes part of how this is built.",
@@ -99,6 +101,7 @@ export default function App() {
       <main className="relative z-10">
         <Wound onPrimaryCTA={handleReserve} onFoundingMemberCTA={handleFoundingMember} />
         <Gone />
+        <DayWithEther />
         <Bridge />
         <Future />
         <Build />
