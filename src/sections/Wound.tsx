@@ -53,18 +53,20 @@ export function Wound({ onPrimaryCTA, onFoundingMemberCTA }: Props) {
           className="animate-float-in font-[Source_Serif_4,Georgia,serif] italic font-normal leading-[1.5] mb-4 text-[18px] sm:text-[22px] max-w-[580px]"
           style={{ color: "#B0B8C6", animationDelay: "300ms" }}
         >
-          Your stories. Your ideas. The things your kids said.
+          The thing your daughter said.
           <br />
           The way you actually think.
           <br />
-          Saved by voice. Forever yours.
+          The lessons you'd kill to leave behind.
+          <br />
+          Saved by voice. Yours today — and one day, theirs.
         </p>
 
         <p
           className="animate-float-in font-[Inter,system-ui,sans-serif] font-normal leading-[1.5] mb-10 sm:mb-12 text-[14px] max-w-[540px]"
           style={{ color: "#8A93A6", animationDelay: "350ms" }}
         >
-          Built for parents, partners, grandparents, and anyone who's ever lost a great idea on the school run.
+          Built for parents, partners, grandparents — anyone who wants to be remembered properly.
         </p>
 
         <div
