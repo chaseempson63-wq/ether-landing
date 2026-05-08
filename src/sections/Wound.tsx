@@ -46,7 +46,7 @@ export function Wound({ onPrimaryCTA, onFoundingMemberCTA }: Props) {
           className="animate-float-in font-[Space_Grotesk,system-ui,sans-serif] font-semibold leading-[1.1] mb-6 text-[36px] sm:text-[48px] md:text-[56px]"
           style={{ color: "#F3F5FF", animationDelay: "200ms" }}
         >
-          The vault for everything you don't want to forget.
+          The vault for the way you actually think.
         </h1>
 
         <p
