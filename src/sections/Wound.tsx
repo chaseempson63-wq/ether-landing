@@ -36,26 +36,35 @@ export function Wound({ onPrimaryCTA, onFoundingMemberCTA }: Props) {
         </div>
 
         <p
-          className="animate-float-in font-[Inter,system-ui,sans-serif] text-[11px] tracking-[0.18em] uppercase mb-5"
-          style={{ color: "#B0B8C6", animationDelay: "100ms" }}
+          className="animate-float-in font-[Inter,system-ui,sans-serif] text-[11px] tracking-[0.18em] uppercase mb-5 font-medium"
+          style={{ color: "#FFD27A", animationDelay: "100ms" }}
         >
-          A quiet project for the people who matter most
+          A quiet place for the things that matter
         </p>
 
         <h1
           className="animate-float-in font-[Space_Grotesk,system-ui,sans-serif] font-semibold leading-[1.1] mb-6 text-[36px] sm:text-[48px] md:text-[56px]"
           style={{ color: "#F3F5FF", animationDelay: "200ms" }}
         >
-          One day they'll ask what you were really like.
-          <br />
-          Make sure they have an answer.
+          The vault for everything you don't want to forget.
         </h1>
 
         <p
-          className="animate-float-in font-[Source_Serif_4,Georgia,serif] italic font-normal leading-[1.5] mb-10 sm:mb-12 text-[18px] sm:text-[22px] max-w-[540px]"
+          className="animate-float-in font-[Source_Serif_4,Georgia,serif] italic font-normal leading-[1.5] mb-4 text-[18px] sm:text-[22px] max-w-[580px]"
           style={{ color: "#B0B8C6", animationDelay: "300ms" }}
         >
-          Photos remember faces. Voicemails keep voices. Ether keeps the way you think — so the people you love can still ask, and still get you.
+          Your stories. Your ideas. The things your kids said.
+          <br />
+          The way you actually think.
+          <br />
+          Saved by voice. Forever yours.
+        </p>
+
+        <p
+          className="animate-float-in font-[Inter,system-ui,sans-serif] font-normal leading-[1.5] mb-10 sm:mb-12 text-[14px] max-w-[540px]"
+          style={{ color: "#8A93A6", animationDelay: "350ms" }}
+        >
+          Built for parents, partners, grandparents, and anyone who's ever lost a great idea on the school run.
         </p>
 
         <div
