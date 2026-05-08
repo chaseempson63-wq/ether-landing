@@ -67,10 +67,12 @@ export function Gone() {
         </div>
 
         <p
-          className="font-[Source_Serif_4,Georgia,serif] italic text-center leading-[1.5] mx-auto max-w-[680px] mt-12 sm:mt-16 text-[16px] sm:text-[18px]"
-          style={{ color: "#8A93A6" }}
+          className="font-[Source_Serif_4,Georgia,serif] italic text-center leading-[1.4] mx-auto max-w-[700px] mt-16 text-[17px] sm:text-[20px]"
+          style={{ color: "#B0B8C6" }}
         >
-          The largest, most consistent loss of intelligence in human history. Until now.
+          One day they'll ask what you were really like.
+          <br />
+          Make sure they have an answer.
         </p>
       </div>
     </section>
