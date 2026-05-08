@@ -53,13 +53,11 @@ export function Wound({ onPrimaryCTA, onFoundingMemberCTA }: Props) {
           className="animate-float-in font-[Source_Serif_4,Georgia,serif] italic font-normal leading-[1.5] mb-4 text-[18px] sm:text-[22px] max-w-[580px]"
           style={{ color: "#B0B8C6", animationDelay: "300ms" }}
         >
-          The thing your daughter said.
-          <br />
-          The way you actually think.
+          Your voice. Your stories.
           <br />
           The lessons you'd kill to leave behind.
           <br />
-          Saved by voice. Yours today — and one day, theirs.
+          Yours today — and one day, theirs.
         </p>
 
         <p
